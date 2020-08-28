@@ -3,18 +3,19 @@ package detectionsystem.Objects;
 import org.bukkit.entity.Player;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class InternetAddressRecord {
 
     private InetSocketAddress IP = null;
-    private UUID uuid = null;
-    private int logins = 0;
+    private HashMap<UUID, Integer> uuids = null;
 
     public InternetAddressRecord(Player player) {
         IP = player.getAddress();
-        uuid = player.getUniqueId();
-        logins = 1;
+        if (!uuids.containsKey(player.getUniqueId())) {
+            uuids.put(player.getUniqueId(), uuids.get(player.getUniqueId()) + 1);
+        }
     }
 
     // getters
@@ -23,12 +24,8 @@ public class InternetAddressRecord {
         return IP;
     }
 
-    public UUID getUUID() {
-        return uuid;
-    }
-
-    public int getLogins() {
-        return logins;
+    public int getLogins(UUID uuid) {
+        return uuids.get(uuid);
     }
 
     // setters
@@ -37,11 +34,7 @@ public class InternetAddressRecord {
         IP = newIP;
     }
 
-    public void setUUID(UUID newUUID) {
-        uuid = newUUID;
-    }
-
-    public void incrementLogins() {
-        logins++;
+    public void incrementLogins(Player player) {
+        uuids.replace(player.getUniqueId(), uuids.get(player.getUniqueId()) + 1);
     }
 }
