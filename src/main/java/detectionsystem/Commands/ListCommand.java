@@ -22,29 +22,15 @@ public class ListCommand {
             if (player.hasPermission("aaf.list")) {
                 if (args.length > 0) {
                     if (args[0].equalsIgnoreCase("suspected")) {
-                        for (InternetAddressRecord record : main.internetAddressRecords) {
-                            Player primary = record.getPlayerWithMostLogins();
-                            if (record.getFlag().equalsIgnoreCase("suspected")) {
-                                player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
-                                + record.getSecondaryAccountsFormatted());
-                            }
-                        }
+                        listSuspected(player);
                     }
 
                     if (args[0].equalsIgnoreCase("probable")) {
-                        for (InternetAddressRecord record : main.internetAddressRecords) {
-                            Player primary = record.getPlayerWithMostLogins();
-                            if (record.getFlag().equalsIgnoreCase("probable")) {
-                                player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
-                                        + record.getSecondaryAccountsFormatted());
-                            }
-                        }
+                        listProbable(player);
                     }
 
                     if (args[0].equalsIgnoreCase("addresses")) {
-                        for (InternetAddressRecord record : main.internetAddressRecords) {
-                            player.sendMessage(ChatColor.AQUA + "" + record.getIP().toString());
-                        }
+                        listAddresses(player);
                     }
 
                 }
@@ -54,6 +40,32 @@ public class ListCommand {
             }
         }
 
+    }
+
+    public void listSuspected(Player player) {
+        for (InternetAddressRecord record : main.internetAddressRecords) {
+            Player primary = record.getPlayerWithMostLogins();
+            if (record.getFlag().equalsIgnoreCase("suspected")) {
+                player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
+                        + record.getSecondaryAccountsFormatted());
+            }
+        }
+    }
+
+    public void listProbable(Player player) {
+        for (InternetAddressRecord record : main.internetAddressRecords) {
+            Player primary = record.getPlayerWithMostLogins();
+            if (record.getFlag().equalsIgnoreCase("probable")) {
+                player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
+                        + record.getSecondaryAccountsFormatted());
+            }
+        }
+    }
+
+    public void listAddresses(Player player) {
+        for (InternetAddressRecord record : main.internetAddressRecords) {
+            player.sendMessage(ChatColor.AQUA + "" + record.getIP().toString());
+        }
     }
 
 }

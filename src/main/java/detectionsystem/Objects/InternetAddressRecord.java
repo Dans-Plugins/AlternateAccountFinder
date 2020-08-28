@@ -55,6 +55,7 @@ public class InternetAddressRecord {
             uuids.add(uuid);
             logins.put(uuid, 1);
             setFlag("suspected");
+            System.out.println(IP.toString() +  " has been flagged as as suspected. There may be multiple accounts using this IP address.");
         }
     }
 

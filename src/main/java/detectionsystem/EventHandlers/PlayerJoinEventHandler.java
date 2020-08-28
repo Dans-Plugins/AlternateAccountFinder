@@ -17,11 +17,13 @@ public class PlayerJoinEventHandler {
         Player player = event.getPlayer();
         InternetAddressRecord record = main.utilities.getInternetAddressRecord(player.getAddress());
         if (record == null) { // no record of this IP address exists, create one
+            System.out.println(player.getName() + " has logged in with a new IP address. Creating record.");
             InternetAddressRecord newRecord = new InternetAddressRecord(player);
             main.internetAddressRecords.add(newRecord);
         }
         else { // record exists
             if (record.getLogins(player.getUniqueId()) == 0) { // IP address has been used before, but not with this account, add the uuid.
+                System.out.println(player.getName() + " has logged in with an IP address that has been used before. Altering record.");
                 record.addSecondaryUUID(player.getUniqueId());
             }
             else {
