@@ -15,7 +15,7 @@ public class UtilitySubsystem {
 
     public InternetAddressRecord getInternetAddressRecord(InetSocketAddress IP) {
         for (InternetAddressRecord record : main.internetAddressRecords) {
-            if (record.getIP().equals(IP)) {
+            if (record.getIP().getAddress().equals(record.getIP().getAddress())) {
                 return record;
             }
         }
