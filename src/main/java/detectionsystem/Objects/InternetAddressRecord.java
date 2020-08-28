@@ -1,15 +1,18 @@
 package detectionsystem.Objects;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class InternetAddressRecord {
 
     private InetSocketAddress IP = null;
-    private HashMap<UUID, Integer> uuids = null;
+    private ArrayList<UUID> uuids = null;
+    private HashMap<UUID, Integer> logins = null;
     private String flag = "none";
 
     public InternetAddressRecord(Player player) {
@@ -22,7 +25,7 @@ public class InternetAddressRecord {
     }
 
     public int getLogins(UUID uuid) {
-        return uuids.getOrDefault(uuid, 0);
+        return logins.getOrDefault(uuid, 0);
     }
 
     public String getFlag() {
@@ -38,19 +41,49 @@ public class InternetAddressRecord {
     }
 
     public void incrementLogins(Player player) {
-        uuids.replace(player.getUniqueId(), uuids.get(player.getUniqueId()) + 1);
+        logins.replace(player.getUniqueId(), logins.get(player.getUniqueId()) + 1);
     }
 
-    // this should only ever run if multiple accounts log in using this IP address
     public void addUUID(UUID uuid) {
-        if (!uuids.containsKey(uuid)) {
-            uuids.put(uuid, 1);
-            setFlag("suspected");
+        if (!uuids.contains(uuid)) {
+            logins.put(uuid, 1);
         }
         else {
-            if (uuids.get(uuid) >= 3) {
+            if (logins.get(uuid) >= 3) {
                 setFlag("probable");
             }
+            else {
+                setFlag("suspected");
+            }
         }
+    }
+
+    public Player getPlayerWithMostLogins() {
+        int max = 0;
+        Player toReturn = null;
+        for (UUID uuid : uuids) {
+            if (logins.get(uuid) > max) {
+                toReturn = Bukkit.getPlayer(uuid);
+            }
+        }
+        return toReturn;
+    }
+
+    public String getSecondaryAccountsFormatted() {
+
+        String toReturn = "";
+
+        Player primary = getPlayerWithMostLogins();
+
+        int counter = 0;
+        for (UUID uuid : uuids) {
+            if (!uuid.equals(primary.getUniqueId()))
+            toReturn = toReturn + Bukkit.getPlayer(uuid).getName() + " [" + getLogins(uuid) + "]";
+            counter++;
+            if (counter < uuids.size()) {
+                toReturn = toReturn + ", ";
+            }
+        }
+        return toReturn;
     }
 }
