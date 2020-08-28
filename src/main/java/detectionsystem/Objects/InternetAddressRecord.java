@@ -47,5 +47,10 @@ public class InternetAddressRecord {
             uuids.put(uuid, 1);
             setFlag("suspected");
         }
+        else {
+            if (uuids.get(uuid) >= 3) {
+                setFlag("probable");
+            }
+        }
     }
 }
