@@ -55,30 +55,27 @@ public class InternetAddressRecord {
             uuids.add(uuid);
             logins.put(uuid, 1);
             setFlag("suspected");
-            System.out.println(IP.toString() +  " has been flagged as as suspected. There may be multiple accounts using this IP address.");
+            System.out.println(IP.getAddress().toString() +  " has been flagged as as suspected. There may be multiple accounts using this IP address.");
         }
     }
 
-    public Player getPlayerWithMostLogins() {
+    public UUID getPlayerUUIDWithMostLogins() {
         int max = 0;
-        Player toReturn = null;
         for (UUID uuid : uuids) {
             if (logins.get(uuid) > max) {
-                toReturn = (Player) Bukkit.getOfflinePlayer(uuid);
+                return uuid;
             }
         }
-        return toReturn;
+        return null;
     }
 
     public String getSecondaryAccountsFormatted() {
 
         String toReturn = "";
 
-        Player primary = getPlayerWithMostLogins();
-
         int counter = 0;
         for (UUID uuid : uuids) {
-            if (!uuid.equals(primary.getUniqueId()))
+            if (!uuid.equals(getPlayerUUIDWithMostLogins()))
             toReturn = toReturn + Bukkit.getOfflinePlayer(uuid).getName() + " [" + getLogins(uuid) + "]";
             counter++;
             if (counter < uuids.size()) {

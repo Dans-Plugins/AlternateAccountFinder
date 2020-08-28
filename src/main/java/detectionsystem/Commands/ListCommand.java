@@ -2,7 +2,9 @@ package detectionsystem.Commands;
 
 import detectionsystem.AlternateAccountFinder;
 import detectionsystem.Objects.InternetAddressRecord;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -44,7 +46,7 @@ public class ListCommand {
 
     public void listSuspected(Player player) {
         for (InternetAddressRecord record : main.internetAddressRecords) {
-            Player primary = record.getPlayerWithMostLogins();
+            OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("suspected")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
                         + record.getSecondaryAccountsFormatted());
@@ -54,7 +56,7 @@ public class ListCommand {
 
     public void listProbable(Player player) {
         for (InternetAddressRecord record : main.internetAddressRecords) {
-            Player primary = record.getPlayerWithMostLogins();
+            OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("probable")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
                         + record.getSecondaryAccountsFormatted());
