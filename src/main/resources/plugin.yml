@@ -1,4 +1,8 @@
 name: AlternateAccountFinder
-version: ${project.version}
+version: v0.9
+author: DanTheTechMan
 main: detectionsystem.AlternateAccountFinder
-api-version: 1.16
+api-version: 1.13
+
+commands:
+  aaflist:

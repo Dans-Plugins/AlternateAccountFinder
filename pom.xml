@@ -6,7 +6,7 @@
 
     <groupId>DansPlugins</groupId>
     <artifactId>AlternateAccountFinder</artifactId>
-    <version>v0.1</version>
+    <version>v0.9</version>
     <packaging>jar</packaging>
 
     <name>AlternateAccountFinder</name>
