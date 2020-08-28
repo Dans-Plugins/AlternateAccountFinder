@@ -41,6 +41,12 @@ public class ListCommand {
                         }
                     }
 
+                    if (args[0].equalsIgnoreCase("addresses")) {
+                        for (InternetAddressRecord record : main.internetAddressRecords) {
+                            player.sendMessage(ChatColor.AQUA + "" + record.getIP().toString());
+                        }
+                    }
+
                 }
             }
             else {

@@ -22,10 +22,10 @@ public class PlayerJoinEventHandler {
         }
         else { // record exists
             if (record.getLogins(player.getUniqueId()) == 0) { // IP address has been used before, but not with this account, add the uuid.
-                record.addUUID(player.getUniqueId());
+                record.addSecondaryUUID(player.getUniqueId());
             }
             else {
-                record.incrementLogins(event.getPlayer()); // IP address has been used before with this account, increment logins for this player.
+                record.incrementLogins(player); // IP address has been used before with this account, increment logins for this player.
             }
         }
     }

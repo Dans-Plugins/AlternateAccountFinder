@@ -17,7 +17,10 @@ public class InternetAddressRecord {
 
     public InternetAddressRecord(Player player) {
         setIP(player.getAddress());
-        addUUID(player.getUniqueId());
+        if (!uuids.contains(player.getUniqueId())) {
+            uuids.add(player.getUniqueId());
+            logins.put(player.getUniqueId(), 1);
+        }
     }
 
     public InetSocketAddress getIP() {
@@ -42,19 +45,16 @@ public class InternetAddressRecord {
 
     public void incrementLogins(Player player) {
         logins.replace(player.getUniqueId(), logins.get(player.getUniqueId()) + 1);
+
+        // TODO: check if two players have logged in more than 3 times, if so flag as probable
     }
 
-    public void addUUID(UUID uuid) {
+    // this only ever gets called when a secondary account logs in using this IP address (primary account added in constructor)
+    public void addSecondaryUUID(UUID uuid) {
         if (!uuids.contains(uuid)) {
+            uuids.add(uuid);
             logins.put(uuid, 1);
-        }
-        else {
-            if (logins.get(uuid) >= 3) {
-                setFlag("probable");
-            }
-            else {
-                setFlag("suspected");
-            }
+            setFlag("suspected");
         }
     }
 
