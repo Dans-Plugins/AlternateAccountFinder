@@ -60,13 +60,15 @@ public class InternetAddressRecord {
     }
 
     public UUID getPlayerUUIDWithMostLogins() {
+        UUID toReturn = null;
         int max = 0;
         for (UUID uuid : uuids) {
             if (logins.get(uuid) > max) {
-                return uuid;
+                max = logins.get(uuid);
+                toReturn = uuid;
             }
         }
-        return null;
+        return toReturn;
     }
 
     public String getSecondaryAccountsFormatted() {
