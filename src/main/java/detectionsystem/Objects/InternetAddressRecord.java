@@ -11,8 +11,8 @@ import java.util.UUID;
 public class InternetAddressRecord {
 
     private InetSocketAddress IP = null;
-    private ArrayList<UUID> uuids = null;
-    private HashMap<UUID, Integer> logins = null;
+    private ArrayList<UUID> uuids = new ArrayList<>();
+    private HashMap<UUID, Integer> logins = new HashMap<>();
     private String flag = "none";
 
     public InternetAddressRecord(Player player) {
