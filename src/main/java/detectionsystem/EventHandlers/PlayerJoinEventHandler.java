@@ -16,12 +16,17 @@ public class PlayerJoinEventHandler {
     public void handle(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         InternetAddressRecord record = main.utilities.getInternetAddressRecord(player.getAddress());
-        if (record == null) {
+        if (record == null) { // no record of this IP address exists, create one
             InternetAddressRecord newRecord = new InternetAddressRecord(player);
             main.internetAddressRecords.add(newRecord);
         }
-        else {
-            record.incrementLogins(event.getPlayer());
+        else { // record exists
+            if (record.getLogins(player.getUniqueId()) == 0) { // IP address has been used before, but not with this account, add the uuid.
+                record.addUUID(player.getUniqueId());
+            }
+            else {
+                record.incrementLogins(event.getPlayer()); // IP address has been used before with this account, increment logins for this player.
+            }
         }
     }
 }

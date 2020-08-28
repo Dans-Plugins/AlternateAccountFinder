@@ -10,13 +10,12 @@ public class InternetAddressRecord {
 
     private InetSocketAddress IP = null;
     private HashMap<UUID, Integer> uuids = null;
+    private String flag = "none";
 
     public InternetAddressRecord(Player player) {
         setIP(player.getAddress());
         addUUID(player.getUniqueId());
     }
-
-    // getters
 
     public InetSocketAddress getIP() {
         return IP;
@@ -26,19 +25,27 @@ public class InternetAddressRecord {
         return uuids.getOrDefault(uuid, 0);
     }
 
-    // setters
+    public String getFlag() {
+        return flag;
+    }
 
     public void setIP(InetSocketAddress newIP) {
         IP = newIP;
+    }
+
+    public void setFlag(String s) {
+        flag = s;
     }
 
     public void incrementLogins(Player player) {
         uuids.replace(player.getUniqueId(), uuids.get(player.getUniqueId()) + 1);
     }
 
+    // this should only ever run if a second account logs in using this IP address
     public void addUUID(UUID uuid) {
         if (!uuids.containsKey(uuid)) {
             uuids.put(uuid, 1);
+            setFlag("suspected");
         }
     }
 }
