@@ -41,7 +41,7 @@ public class InternetAddressRecord {
         uuids.replace(player.getUniqueId(), uuids.get(player.getUniqueId()) + 1);
     }
 
-    // this should only ever run if a second account logs in using this IP address
+    // this should only ever run if multiple accounts log in using this IP address
     public void addUUID(UUID uuid) {
         if (!uuids.containsKey(uuid)) {
             uuids.put(uuid, 1);
