@@ -87,4 +87,8 @@ public class InternetAddressRecord {
         }
         return toReturn;
     }
+
+    public int getNumUUIDS() {
+        return uuids.size();
+    }
 }
