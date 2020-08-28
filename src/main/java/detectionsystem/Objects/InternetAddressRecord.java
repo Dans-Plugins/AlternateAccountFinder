@@ -80,7 +80,7 @@ public class InternetAddressRecord {
             if (!uuid.equals(getPlayerUUIDWithMostLogins()))
             toReturn = toReturn + Bukkit.getOfflinePlayer(uuid).getName() + " [" + getLogins(uuid) + "]";
             counter++;
-            if (counter < uuids.size()) {
+            if (counter < uuids.size() && counter != 1) {
                 toReturn = toReturn + ", ";
             }
         }
