@@ -12,10 +12,8 @@ public class InternetAddressRecord {
     private HashMap<UUID, Integer> uuids = null;
 
     public InternetAddressRecord(Player player) {
-        IP = player.getAddress();
-        if (!uuids.containsKey(player.getUniqueId())) {
-            uuids.put(player.getUniqueId(), uuids.get(player.getUniqueId()) + 1);
-        }
+        setIP(player.getAddress());
+        addUUID(player.getUniqueId());
     }
 
     // getters
@@ -25,7 +23,7 @@ public class InternetAddressRecord {
     }
 
     public int getLogins(UUID uuid) {
-        return uuids.get(uuid);
+        return uuids.getOrDefault(uuid, 0);
     }
 
     // setters
@@ -36,5 +34,11 @@ public class InternetAddressRecord {
 
     public void incrementLogins(Player player) {
         uuids.replace(player.getUniqueId(), uuids.get(player.getUniqueId()) + 1);
+    }
+
+    public void addUUID(UUID uuid) {
+        if (!uuids.containsKey(uuid)) {
+            uuids.put(uuid, 1);
+        }
     }
 }
