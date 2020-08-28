@@ -64,7 +64,7 @@ public class ListCommand {
 
     public void listAddresses(Player player) {
         for (InternetAddressRecord record : main.internetAddressRecords) {
-            player.sendMessage(ChatColor.AQUA + "" + record.getIP().toString());
+            player.sendMessage(ChatColor.AQUA + "" + record.getIP().getAddress().toString());
         }
     }
 

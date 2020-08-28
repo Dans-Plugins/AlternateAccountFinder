@@ -64,7 +64,7 @@ public class InternetAddressRecord {
         Player toReturn = null;
         for (UUID uuid : uuids) {
             if (logins.get(uuid) > max) {
-                toReturn = Bukkit.getPlayer(uuid);
+                toReturn = (Player) Bukkit.getOfflinePlayer(uuid);
             }
         }
         return toReturn;
@@ -79,7 +79,7 @@ public class InternetAddressRecord {
         int counter = 0;
         for (UUID uuid : uuids) {
             if (!uuid.equals(primary.getUniqueId()))
-            toReturn = toReturn + Bukkit.getPlayer(uuid).getName() + " [" + getLogins(uuid) + "]";
+            toReturn = toReturn + Bukkit.getOfflinePlayer(uuid).getName() + " [" + getLogins(uuid) + "]";
             counter++;
             if (counter < uuids.size()) {
                 toReturn = toReturn + ", ";
