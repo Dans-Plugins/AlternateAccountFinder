@@ -101,4 +101,12 @@ public class InternetAddressRecord {
     public int getNumUUIDS() {
         return uuids.size();
     }
+
+    public void save() {
+
+    }
+
+    public void load() {
+
+    }
 }
