@@ -1,11 +1,19 @@
 package detectionsystem.Objects;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class InternetAddressRecord {
@@ -21,6 +29,10 @@ public class InternetAddressRecord {
             uuids.add(player.getUniqueId());
             logins.put(player.getUniqueId(), 1);
         }
+    }
+
+    public InternetAddressRecord(Map<String, String> lockedBlockData) {
+        this.load(lockedBlockData);
     }
 
     public InetSocketAddress getIP() {
@@ -102,11 +114,30 @@ public class InternetAddressRecord {
         return uuids.size();
     }
 
-    public void save() {
+    public Map<String, String> save() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();;
+        Map<String, String> saveMap = new HashMap<>();
 
+        saveMap.put("IP", gson.toJson(IP));
+        saveMap.put("uuids", gson.toJson(uuids));
+        saveMap.put("logins", gson.toJson(logins));
+        saveMap.put("flag", gson.toJson(flag));
+
+        return saveMap;
     }
 
-    public void load() {
+    private void load(Map<String, String> data) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();;
 
+        Type addressType = new TypeToken<InetSocketAddress>(){}.getType();
+        Type arrayListTypeUUID = new TypeToken<ArrayList<UUID>>(){}.getType();
+        Type mapType = new TypeToken<HashMap<String, String>>(){}.getType();
+        Type stringType = new TypeToken<String>(){}.getType();
+
+
+        IP = gson.fromJson(data.get("members"), addressType);
+        uuids = gson.fromJson(data.get("enemyFactions"), arrayListTypeUUID);
+        logins = gson.fromJson(data.get("officers"), mapType);
+        flag = gson.fromJson(data.get("allyFactions"), stringType);
     }
 }
