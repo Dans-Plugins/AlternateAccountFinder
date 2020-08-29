@@ -25,16 +25,21 @@ public class ListCommand {
                 if (args.length > 0) {
                     if (args[0].equalsIgnoreCase("suspected")) {
                         listSuspected(player);
+                        return;
                     }
 
                     if (args[0].equalsIgnoreCase("probable")) {
                         listProbable(player);
+                        return;
                     }
 
                     if (args[0].equalsIgnoreCase("addresses")) {
                         listAddresses(player);
                     }
 
+                }
+                else {
+                    player.sendMessage(ChatColor.RED + "Usage: /aaflist [suspected | probable | addresses]");
                 }
             }
             else {
@@ -45,22 +50,32 @@ public class ListCommand {
     }
 
     public void listSuspected(Player player) {
+        int count = 0;
         for (InternetAddressRecord record : main.internetAddressRecords) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("suspected")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
                         + record.getSecondaryAccountsFormatted());
+                count++;
             }
+        }
+        if (count == 0) {
+            player.sendMessage(ChatColor.GREEN + "No suspected alternate accounts!");
         }
     }
 
     public void listProbable(Player player) {
+        int count = 0;
         for (InternetAddressRecord record : main.internetAddressRecords) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("probable")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
                         + record.getSecondaryAccountsFormatted());
+                count++;
             }
+        }
+        if (count == 0) {
+            player.sendMessage(ChatColor.GREEN + "No probable alternate accounts!");
         }
     }
 
