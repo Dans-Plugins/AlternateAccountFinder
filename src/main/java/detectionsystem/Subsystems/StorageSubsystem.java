@@ -39,9 +39,11 @@ public class StorageSubsystem {
     }
 
     private void createSaveFolderIfNonexistant() {
-        File file = new File(FILE_PATH);
+        File saveFolder = new File(FILE_PATH);
         try {
-            file.createNewFile();
+            if (!saveFolder.exists()) {
+                saveFolder.mkdir();
+            }
         } catch(Exception e) {
             System.out.println("A problem occurred creating the necessarily files for the Alternate Account Finder.");
         }
