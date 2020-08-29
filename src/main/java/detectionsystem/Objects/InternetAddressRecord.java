@@ -51,8 +51,11 @@ public class InternetAddressRecord {
             ArrayList<UUID> playersWhoHaveLoggedInAtleastThreeTimes = new ArrayList<>();
             for (UUID uuid : uuids) {
                 if (logins.get(uuid) >= 3) {
-                    setFlag("probable");
+                    playersWhoHaveLoggedInAtleastThreeTimes.add(uuid);
                 }
+            }
+            if (playersWhoHaveLoggedInAtleastThreeTimes.size() > 1) {
+                setFlag("probable");
             }
         }
     }
