@@ -131,7 +131,7 @@ public class InternetAddressRecord {
 
         Type addressType = new TypeToken<InetSocketAddress>(){}.getType();
         Type arrayListTypeUUID = new TypeToken<ArrayList<UUID>>(){}.getType();
-        Type mapType = new TypeToken<HashMap<String, String>>(){}.getType();
+        Type mapType = new TypeToken<HashMap<UUID, Integer>>(){}.getType();
         Type stringType = new TypeToken<String>(){}.getType();
 
 
