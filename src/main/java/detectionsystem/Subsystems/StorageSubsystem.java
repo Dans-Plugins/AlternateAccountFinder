@@ -39,7 +39,13 @@ public class StorageSubsystem {
     }
 
     private void createSaveFolderIfNonexistant() {
-        // TODO
+        File file = new File(FILE_PATH + RECORDS_FILE_NAME);
+        try {
+            file.createNewFile();
+        } catch(Exception e) {
+            System.out.println("A problem occurred creating the necessarily files for the Alternate Account Finder.");
+        }
+
     }
 
     private void saveInternetAddressRecords() {
