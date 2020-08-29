@@ -30,11 +30,16 @@ public class StorageSubsystem {
     }
 
     public void save() {
+        createSaveFolderIfNonexistant();
         saveInternetAddressRecords();
     }
 
     public void load() {
         loadInternetAddressRecords();
+    }
+
+    private void createSaveFolderIfNonexistant() {
+        // TODO
     }
 
     private void saveInternetAddressRecords() {
