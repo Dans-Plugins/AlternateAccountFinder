@@ -39,7 +39,7 @@ public class StorageSubsystem {
     }
 
     private void createSaveFolderIfNonexistant() {
-        File file = new File(FILE_PATH + RECORDS_FILE_NAME);
+        File file = new File(FILE_PATH);
         try {
             file.createNewFile();
         } catch(Exception e) {
