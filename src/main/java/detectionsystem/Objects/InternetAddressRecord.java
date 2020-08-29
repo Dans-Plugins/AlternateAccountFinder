@@ -135,9 +135,9 @@ public class InternetAddressRecord {
         Type stringType = new TypeToken<String>(){}.getType();
 
 
-        IP = gson.fromJson(data.get("members"), addressType);
-        uuids = gson.fromJson(data.get("enemyFactions"), arrayListTypeUUID);
-        logins = gson.fromJson(data.get("officers"), mapType);
-        flag = gson.fromJson(data.get("allyFactions"), stringType);
+        IP = gson.fromJson(data.get("IP"), addressType);
+        uuids = gson.fromJson(data.get("uuids"), arrayListTypeUUID);
+        logins = gson.fromJson(data.get("logins"), mapType);
+        flag = gson.fromJson(data.get("flag"), stringType);
     }
 }
