@@ -3,6 +3,7 @@ package detectionsystem.Subsystems;
 import detectionsystem.AlternateAccountFinder;
 import detectionsystem.Objects.InternetAddressRecord;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 public class UtilitySubsystem {
@@ -13,9 +14,9 @@ public class UtilitySubsystem {
         main = plugin;
     }
 
-    public InternetAddressRecord getInternetAddressRecord(InetSocketAddress IP) {
+    public InternetAddressRecord getInternetAddressRecord(InetAddress IP) {
         for (InternetAddressRecord record : main.internetAddressRecords) {
-            if (record.getIP().getAddress().equals(IP.getAddress())) {
+            if (record.getIP().equals(IP)) {
                 return record;
             }
         }

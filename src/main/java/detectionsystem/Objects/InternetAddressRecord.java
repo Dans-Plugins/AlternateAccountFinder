@@ -6,10 +6,8 @@ import com.google.gson.GsonBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,13 +16,13 @@ import java.util.UUID;
 
 public class InternetAddressRecord {
 
-    private InetSocketAddress IP = null;
+    private InetAddress IP = null;
     private ArrayList<UUID> uuids = new ArrayList<>();
     private HashMap<UUID, Integer> logins = new HashMap<>();
     private String flag = "none";
 
     public InternetAddressRecord(Player player) {
-        setIP(player.getAddress());
+        setIP(player.getAddress().getAddress());
         if (!uuids.contains(player.getUniqueId())) {
             uuids.add(player.getUniqueId());
             logins.put(player.getUniqueId(), 1);
@@ -35,7 +33,7 @@ public class InternetAddressRecord {
         this.load(lockedBlockData);
     }
 
-    public InetSocketAddress getIP() {
+    public InetAddress getIP() {
         return IP;
     }
 
@@ -47,7 +45,7 @@ public class InternetAddressRecord {
         return flag;
     }
 
-    public void setIP(InetSocketAddress newIP) {
+    public void setIP(InetAddress newIP) {
         IP = newIP;
     }
 
@@ -117,7 +115,6 @@ public class InternetAddressRecord {
     public Map<String, String> save() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();;
         Map<String, String> saveMap = new HashMap<>();
-
         saveMap.put("IP", gson.toJson(IP));
         saveMap.put("uuids", gson.toJson(uuids));
         saveMap.put("logins", gson.toJson(logins));
@@ -129,7 +126,7 @@ public class InternetAddressRecord {
     private void load(Map<String, String> data) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();;
 
-        Type addressType = new TypeToken<InetSocketAddress>(){}.getType();
+        Type addressType = new TypeToken<InetAddress>(){}.getType();
         Type arrayListTypeUUID = new TypeToken<ArrayList<UUID>>(){}.getType();
         Type mapType = new TypeToken<HashMap<UUID, Integer>>(){}.getType();
         Type stringType = new TypeToken<String>(){}.getType();
