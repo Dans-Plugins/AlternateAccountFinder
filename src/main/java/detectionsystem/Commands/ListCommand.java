@@ -54,7 +54,7 @@ public class ListCommand {
         for (InternetAddressRecord record : main.internetAddressRecords) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("suspected")) {
-                player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
+                player.sendMessage(ChatColor.AQUA + "" + primary.getName() + " [" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
                         + record.getSecondaryAccountsFormatted());
                 count++;
             }
@@ -69,7 +69,7 @@ public class ListCommand {
         for (InternetAddressRecord record : main.internetAddressRecords) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("probable")) {
-                player.sendMessage(ChatColor.AQUA + "" + primary.getName() + "[" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
+                player.sendMessage(ChatColor.AQUA + "" + primary.getName() + " [" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
                         + record.getSecondaryAccountsFormatted());
                 count++;
             }
