@@ -3,6 +3,7 @@ package detectionsystem;
 import detectionsystem.EventHandlers.PlayerJoinEventHandler;
 import detectionsystem.Objects.InternetAddressRecord;
 import detectionsystem.Subsystems.CommandSubsystem;
+import detectionsystem.Subsystems.StorageSubsystem;
 import detectionsystem.Subsystems.UtilitySubsystem;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,7 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
 
     // subsystems
     private CommandSubsystem commandInterpreter = new CommandSubsystem(this);
+    private StorageSubsystem storage = new StorageSubsystem(this);
     public UtilitySubsystem utilities = new UtilitySubsystem(this);
 
     // saved
@@ -24,12 +26,13 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
 
     @Override
     public void onEnable() {
+        storage.load();
         this.getServer().getPluginManager().registerEvents(this, this);
     }
 
     @Override
     public void onDisable() {
-
+        storage.save();
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
