@@ -46,7 +46,15 @@ public class InternetAddressRecord {
     public void incrementLogins(Player player) {
         logins.replace(player.getUniqueId(), logins.get(player.getUniqueId()) + 1);
 
-        // TODO: check if two players have logged in more than 3 times, if so flag as probable
+        // check if two players have logged in at least 3 times, if so flag as probable
+        if (getNumUUIDS() > 1) {
+            ArrayList<UUID> playersWhoHaveLoggedInAtleastThreeTimes = new ArrayList<>();
+            for (UUID uuid : uuids) {
+                if (logins.get(uuid) >= 3) {
+                    setFlag("probable");
+                }
+            }
+        }
     }
 
     // this only ever gets called when a secondary account logs in using this IP address (primary account added in constructor)
