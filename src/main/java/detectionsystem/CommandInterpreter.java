@@ -1,6 +1,7 @@
 package detectionsystem;
 
 import detectionsystem.commands.ListCommand;
+import detectionsystem.commands.SearchCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -22,11 +23,14 @@ public class CommandInterpreter {
     public boolean interpretCommand(CommandSender sender, String label, String[] args) {
         switch(label) {
             case "aaflist":
-                ListCommand command = new ListCommand();
-                command.showInfo(sender, args);
+                ListCommand listCommand = new ListCommand();
+                listCommand.showInfo(sender, args);
                 break;
+            case "aafsearch":
+                SearchCommand searchCommand = new SearchCommand();
+                searchCommand.searchForPlayer(sender, args);
             default:
-                sender.sendMessage(ChatColor.RED + "AlternateAccountFinder doesn't know that command");
+                sender.sendMessage(ChatColor.RED + "AlternateAccountFinder doesn't know that command!");
         }
 
         return false;
