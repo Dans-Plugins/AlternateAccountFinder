@@ -2,6 +2,7 @@ package detectionsystem.data;
 
 import detectionsystem.objects.InternetAddressRecord;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class PersistentData {
@@ -23,6 +24,15 @@ public class PersistentData {
 
     public ArrayList<InternetAddressRecord> getInternetAddressRecords() {
         return internetAddressRecords;
+    }
+
+    public InternetAddressRecord getInternetAddressRecord(InetAddress IP) {
+        for (InternetAddressRecord record : getInternetAddressRecords()) {
+            if (record.getIP().equals(IP)) {
+                return record;
+            }
+        }
+        return null;
     }
 
 }

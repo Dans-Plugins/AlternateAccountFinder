@@ -16,7 +16,6 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     // subsystems
     private CommandInterpreter commandInterpreter = new CommandInterpreter(this);
     private StorageManager storage = new StorageManager(this);
-    public Utilities utilities = new Utilities(this);
 
     @Override
     public void onEnable() {

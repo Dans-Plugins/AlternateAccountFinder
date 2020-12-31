@@ -16,7 +16,7 @@ public class PlayerJoinEventHandler {
 
     public void handle(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        InternetAddressRecord record = main.utilities.getInternetAddressRecord(player.getAddress().getAddress());
+        InternetAddressRecord record = PersistentData.getInstance().getInternetAddressRecord(player.getAddress().getAddress());
         if (record == null) { // no record of this IP address exists, create one
             System.out.println(player.getName() + " has joined with a new IP address. Creating record.");
             InternetAddressRecord newRecord = new InternetAddressRecord(player);
