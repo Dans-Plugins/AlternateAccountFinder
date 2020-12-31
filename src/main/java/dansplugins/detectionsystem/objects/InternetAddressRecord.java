@@ -1,11 +1,10 @@
-package detectionsystem.objects;
+package dansplugins.detectionsystem.objects;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import detectionsystem.UUIDChecker;
+import dansplugins.detectionsystem.UUIDChecker;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Type;

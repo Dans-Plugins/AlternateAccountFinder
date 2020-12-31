@@ -1,6 +1,6 @@
-package detectionsystem;
+package dansplugins.detectionsystem;
 
-import detectionsystem.eventhandlers.PlayerJoinEventHandler;
+import dansplugins.detectionsystem.eventhandlers.PlayerJoinEventHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;

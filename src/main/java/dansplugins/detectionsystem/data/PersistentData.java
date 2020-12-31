@@ -1,6 +1,6 @@
-package detectionsystem.data;
+package dansplugins.detectionsystem.data;
 
-import detectionsystem.objects.InternetAddressRecord;
+import dansplugins.detectionsystem.objects.InternetAddressRecord;
 
 import java.net.InetAddress;
 import java.util.ArrayList;

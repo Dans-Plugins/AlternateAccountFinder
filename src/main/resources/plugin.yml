@@ -1,7 +1,7 @@
 name: AlternateAccountFinder
 version: 1.1
 author: DanTheTechMan
-main: detectionsystem.AlternateAccountFinder
+main: dansplugins.detectionsystem.AlternateAccountFinder
 api-version: 1.13
 
 commands:

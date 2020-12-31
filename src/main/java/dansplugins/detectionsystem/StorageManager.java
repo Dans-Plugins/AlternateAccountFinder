@@ -1,11 +1,11 @@
-package detectionsystem;
+package dansplugins.detectionsystem;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
-import detectionsystem.data.PersistentData;
-import detectionsystem.objects.InternetAddressRecord;
+import dansplugins.detectionsystem.data.PersistentData;
+import dansplugins.detectionsystem.objects.InternetAddressRecord;
 
 import java.io.*;
 import java.lang.reflect.Type;

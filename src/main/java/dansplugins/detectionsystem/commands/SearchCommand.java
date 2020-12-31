@@ -1,15 +1,11 @@
-package detectionsystem.commands;
+package dansplugins.detectionsystem.commands;
 
-import detectionsystem.UUIDChecker;
-import detectionsystem.data.PersistentData;
-import detectionsystem.objects.InternetAddressRecord;
-import org.bukkit.Bukkit;
+import dansplugins.detectionsystem.data.PersistentData;
+import dansplugins.detectionsystem.objects.InternetAddressRecord;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class SearchCommand {
 

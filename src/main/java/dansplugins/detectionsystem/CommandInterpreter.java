@@ -1,7 +1,7 @@
-package detectionsystem;
+package dansplugins.detectionsystem;
 
-import detectionsystem.commands.ListCommand;
-import detectionsystem.commands.SearchCommand;
+import dansplugins.detectionsystem.commands.ListCommand;
+import dansplugins.detectionsystem.commands.SearchCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 

@@ -1,4 +1,4 @@
-package detectionsystem;
+package dansplugins.detectionsystem;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
