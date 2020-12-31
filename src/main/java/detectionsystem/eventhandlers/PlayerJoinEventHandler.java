@@ -1,7 +1,7 @@
-package detectionsystem.EventHandlers;
+package detectionsystem.eventhandlers;
 
 import detectionsystem.AlternateAccountFinder;
-import detectionsystem.Objects.InternetAddressRecord;
+import detectionsystem.objects.InternetAddressRecord;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 

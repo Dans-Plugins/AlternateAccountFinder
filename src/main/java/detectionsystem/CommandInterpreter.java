@@ -1,15 +1,15 @@
-package detectionsystem.Subsystems;
+package detectionsystem;
 
 import detectionsystem.AlternateAccountFinder;
-import detectionsystem.Commands.ListCommand;
+import detectionsystem.commands.ListCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class CommandSubsystem {
+public class CommandInterpreter {
 
     AlternateAccountFinder main = null;
 
-    public CommandSubsystem(AlternateAccountFinder plugin) {
+    public CommandInterpreter(AlternateAccountFinder plugin) {
         main = plugin;
     }
 

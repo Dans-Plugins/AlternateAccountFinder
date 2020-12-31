@@ -1,16 +1,15 @@
-package detectionsystem.Subsystems;
+package detectionsystem;
 
 import detectionsystem.AlternateAccountFinder;
-import detectionsystem.Objects.InternetAddressRecord;
+import detectionsystem.objects.InternetAddressRecord;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
-public class UtilitySubsystem {
+public class Utilities {
 
     AlternateAccountFinder main = null;
 
-    public UtilitySubsystem(AlternateAccountFinder plugin) {
+    public Utilities(AlternateAccountFinder plugin) {
         main = plugin;
     }
 

@@ -1,7 +1,7 @@
-package detectionsystem.Commands;
+package detectionsystem.commands;
 
 import detectionsystem.AlternateAccountFinder;
-import detectionsystem.Objects.InternetAddressRecord;
+import detectionsystem.objects.InternetAddressRecord;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
