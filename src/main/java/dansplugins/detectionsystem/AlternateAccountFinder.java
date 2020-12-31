@@ -1,5 +1,6 @@
 package dansplugins.detectionsystem;
 
+import dansplugins.detectionsystem.bstats.Metrics;
 import dansplugins.detectionsystem.eventhandlers.PlayerJoinEventHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,9 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         instance = this;
         StorageManager.getInstance().load();
         this.getServer().getPluginManager().registerEvents(this, this);
+
+        int pluginId = 9834;
+        Metrics metrics = new Metrics(this, pluginId);
     }
 
     @Override
