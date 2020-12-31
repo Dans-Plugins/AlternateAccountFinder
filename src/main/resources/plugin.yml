@@ -7,3 +7,9 @@ api-version: 1.13
 commands:
   aaflist:
   aafsearch:
+
+permissions:
+  aaf.list:
+    default: op
+  aaf.search:
+    default: op
