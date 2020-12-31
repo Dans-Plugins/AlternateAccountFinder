@@ -13,23 +13,26 @@ import java.util.ArrayList;
 
 public final class AlternateAccountFinder extends JavaPlugin implements Listener {
 
-    // subsystems
-    private CommandInterpreter commandInterpreter = new CommandInterpreter(this);
-    private StorageManager storage = new StorageManager(this);
+    private static AlternateAccountFinder instance;
 
     @Override
     public void onEnable() {
-        storage.load();
+        instance = this;
+        StorageManager.getInstance().load();
         this.getServer().getPluginManager().registerEvents(this, this);
     }
 
     @Override
     public void onDisable() {
-        storage.save();
+        StorageManager.getInstance().save();
+    }
+
+    public static AlternateAccountFinder getInstance() {
+        return instance;
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        return commandInterpreter.interpretCommand(sender, label, args);
+        return CommandInterpreter.getInstance().interpretCommand(sender, label, args);
     }
 
     @EventHandler()

@@ -7,16 +7,23 @@ import org.bukkit.command.CommandSender;
 
 public class CommandInterpreter {
 
-    AlternateAccountFinder main = null;
+    private static CommandInterpreter instance;
 
-    public CommandInterpreter(AlternateAccountFinder plugin) {
-        main = plugin;
+    private CommandInterpreter() {
+
+    }
+
+    public static CommandInterpreter getInstance() {
+        if (instance == null) {
+            instance = new CommandInterpreter();
+        }
+        return instance;
     }
 
     public boolean interpretCommand(CommandSender sender, String label, String[] args) {
         switch(label) {
             case "aaflist":
-                ListCommand command = new ListCommand(main);
+                ListCommand command = new ListCommand(AlternateAccountFinder.getInstance());
                 command.showInfo(sender, args);
                 break;
             default:

@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class StorageManager {
 
-    AlternateAccountFinder main = null;
+    private static StorageManager instance;
 
     private final static String FILE_PATH = "./plugins/AlternateAccountFinder/";
     private final static String RECORDS_FILE_NAME = "records.json";
@@ -26,8 +26,15 @@ public class StorageManager {
 
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();;
 
-    public StorageManager(AlternateAccountFinder plugin) {
-        main = plugin;
+    private StorageManager() {
+
+    }
+
+    public static StorageManager getInstance() {
+        if (instance == null) {
+            instance = new StorageManager();
+        }
+        return instance;
     }
 
     public void save() {
