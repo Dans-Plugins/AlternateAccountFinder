@@ -23,7 +23,7 @@ public class CommandInterpreter {
     public boolean interpretCommand(CommandSender sender, String label, String[] args) {
         switch(label) {
             case "aaflist":
-                ListCommand command = new ListCommand(AlternateAccountFinder.getInstance());
+                ListCommand command = new ListCommand();
                 command.showInfo(sender, args);
                 break;
             default:

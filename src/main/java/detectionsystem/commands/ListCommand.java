@@ -1,6 +1,5 @@
 package detectionsystem.commands;
 
-import detectionsystem.AlternateAccountFinder;
 import detectionsystem.data.PersistentData;
 import detectionsystem.objects.InternetAddressRecord;
 import org.bukkit.Bukkit;
@@ -10,12 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ListCommand {
-
-    AlternateAccountFinder main = null;
-
-    public ListCommand(AlternateAccountFinder plugin) {
-        main = plugin;
-    }
 
     public void showInfo(CommandSender sender, String[] args) {
 
