@@ -35,8 +35,9 @@ public class SearchCommand {
             return;
         }
 
+        sender.sendMessage(ChatColor.AQUA + "\n == Search Results for '" + playerName + "' == ");
         sender.sendMessage(ChatColor.AQUA + "IP addresses used: " + list.size());
-        sender.sendMessage(ChatColor.AQUA + "Potential Alts: " + getPotentialAltsFormatted(playerName, list));
+        sender.sendMessage(ChatColor.AQUA + "Potential Alts: " + getPotentialAltsFormatted(playerName, list) + "\n");
 
     }
 
