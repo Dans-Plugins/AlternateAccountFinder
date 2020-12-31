@@ -4,7 +4,6 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
-import detectionsystem.AlternateAccountFinder;
 import detectionsystem.data.PersistentData;
 import detectionsystem.objects.InternetAddressRecord;
 

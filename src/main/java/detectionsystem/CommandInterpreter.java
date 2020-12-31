@@ -1,6 +1,5 @@
 package detectionsystem;
 
-import detectionsystem.AlternateAccountFinder;
 import detectionsystem.commands.ListCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
