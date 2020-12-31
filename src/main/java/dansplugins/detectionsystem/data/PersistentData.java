@@ -1,6 +1,6 @@
-package detectionsystem.data;
+package dansplugins.detectionsystem.data;
 
-import detectionsystem.objects.InternetAddressRecord;
+import dansplugins.detectionsystem.objects.InternetAddressRecord;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -35,4 +35,16 @@ public class PersistentData {
         return null;
     }
 
+    public ArrayList<InternetAddressRecord> getInternetAddressRecordsAssociatedWithPlayer(String playerName) {
+
+        ArrayList<InternetAddressRecord> toReturn = new ArrayList<>();
+
+        for (InternetAddressRecord record : getInternetAddressRecords()) {
+            if (record.hasPlayerLoggedIn(playerName)) {
+                toReturn.add(record);
+            }
+        }
+
+        return toReturn;
+    }
 }

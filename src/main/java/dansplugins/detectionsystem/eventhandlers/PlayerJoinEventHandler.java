@@ -1,8 +1,8 @@
-package detectionsystem.eventhandlers;
+package dansplugins.detectionsystem.eventhandlers;
 
-import detectionsystem.AlternateAccountFinder;
-import detectionsystem.data.PersistentData;
-import detectionsystem.objects.InternetAddressRecord;
+import dansplugins.detectionsystem.AlternateAccountFinder;
+import dansplugins.detectionsystem.data.PersistentData;
+import dansplugins.detectionsystem.objects.InternetAddressRecord;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 
