@@ -18,9 +18,6 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     private StorageManager storage = new StorageManager(this);
     public Utilities utilities = new Utilities(this);
 
-    // saved
-    public ArrayList<InternetAddressRecord> internetAddressRecords = new ArrayList<>();
-
     @Override
     public void onEnable() {
         storage.load();

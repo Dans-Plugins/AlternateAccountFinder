@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import detectionsystem.AlternateAccountFinder;
+import detectionsystem.data.PersistentData;
 import detectionsystem.objects.InternetAddressRecord;
 
 import java.io.*;
@@ -52,7 +53,7 @@ public class StorageManager {
 
     private void saveInternetAddressRecords() {
         List<Map<String, String>> records = new ArrayList<>();
-        for (InternetAddressRecord record : main.internetAddressRecords){
+        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()){
             records.add(record.save());
         }
 
@@ -61,13 +62,13 @@ public class StorageManager {
     }
 
     private void loadInternetAddressRecords() {
-        main.internetAddressRecords.clear();
+        PersistentData.getInstance().getInternetAddressRecords().clear();
 
         ArrayList<HashMap<String, String>> data = loadDataFromFilename(FILE_PATH + RECORDS_FILE_NAME);
 
         for (Map<String, String> chunkData : data){
             InternetAddressRecord record = new InternetAddressRecord(chunkData);
-            main.internetAddressRecords.add(record);
+            PersistentData.getInstance().getInternetAddressRecords().add(record);
         }
     }
 

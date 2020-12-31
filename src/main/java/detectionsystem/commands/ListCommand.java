@@ -1,6 +1,7 @@
 package detectionsystem.commands;
 
 import detectionsystem.AlternateAccountFinder;
+import detectionsystem.data.PersistentData;
 import detectionsystem.objects.InternetAddressRecord;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -51,7 +52,7 @@ public class ListCommand {
 
     public void listSuspected(Player player) {
         int count = 0;
-        for (InternetAddressRecord record : main.internetAddressRecords) {
+        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("suspected")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + " [" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
@@ -66,7 +67,7 @@ public class ListCommand {
 
     public void listProbable(Player player) {
         int count = 0;
-        for (InternetAddressRecord record : main.internetAddressRecords) {
+        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("probable")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + " [" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
@@ -80,7 +81,7 @@ public class ListCommand {
     }
 
     public void listAddresses(Player player) {
-        for (InternetAddressRecord record : main.internetAddressRecords) {
+        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
             player.sendMessage(ChatColor.AQUA + "" + record.getIP().toString().substring(1));
         }
     }
