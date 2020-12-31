@@ -29,6 +29,7 @@ public class CommandInterpreter {
             case "aafsearch":
                 SearchCommand searchCommand = new SearchCommand();
                 searchCommand.searchForPlayer(sender, args);
+                break;
             default:
                 sender.sendMessage(ChatColor.RED + "AlternateAccountFinder doesn't know that command!");
         }
