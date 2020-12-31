@@ -3,3 +3,4 @@ An open source minecraft plugin that attempts to identify accounts that have use
 
 # Version History
 - v1.0 - "Initial Release"
+- v1.1 - "bStats, Search Command" update
