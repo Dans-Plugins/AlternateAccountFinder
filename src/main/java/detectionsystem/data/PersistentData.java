@@ -35,4 +35,16 @@ public class PersistentData {
         return null;
     }
 
+    public ArrayList<InternetAddressRecord> getInternetAddressRecordsAssociatedWithPlayer(String playerName) {
+
+        ArrayList<InternetAddressRecord> toReturn = new ArrayList<>();
+
+        for (InternetAddressRecord record : getInternetAddressRecords()) {
+            if (record.hasPlayerLoggedIn(playerName)) {
+                toReturn.add(record);
+            }
+        }
+
+        return toReturn;
+    }
 }

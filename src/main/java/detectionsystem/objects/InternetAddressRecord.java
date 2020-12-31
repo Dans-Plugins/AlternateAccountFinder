@@ -3,7 +3,9 @@ package detectionsystem.objects;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import detectionsystem.UUIDChecker;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Type;
@@ -135,5 +137,23 @@ public class InternetAddressRecord {
         uuids = gson.fromJson(data.get("uuids"), arrayListTypeUUID);
         logins = gson.fromJson(data.get("logins"), mapType);
         flag = gson.fromJson(data.get("flag"), stringType);
+    }
+
+    public boolean hasPlayerLoggedIn(String playerName) {
+        UUID uuid = UUIDChecker.getInstance().findUUIDBasedOnPlayerName(playerName);
+
+        if (uuid == null) {
+            return false;
+        }
+
+        return uuids.contains(uuid);
+    }
+
+    public ArrayList<String> getPlayerNames() {
+        ArrayList<String> toReturn = new ArrayList<>();
+        for (UUID uuid : uuids) {
+            toReturn.add(UUIDChecker.getInstance().findPlayerNameBasedOnUUID(uuid));
+        }
+        return toReturn;
     }
 }
