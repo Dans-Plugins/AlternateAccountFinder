@@ -1,10 +1,6 @@
 package detectionsystem;
 
-import detectionsystem.EventHandlers.PlayerJoinEventHandler;
-import detectionsystem.Objects.InternetAddressRecord;
-import detectionsystem.Subsystems.CommandSubsystem;
-import detectionsystem.Subsystems.StorageSubsystem;
-import detectionsystem.Subsystems.UtilitySubsystem;
+import detectionsystem.eventhandlers.PlayerJoinEventHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
@@ -12,31 +8,28 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-
 public final class AlternateAccountFinder extends JavaPlugin implements Listener {
 
-    // subsystems
-    private CommandSubsystem commandInterpreter = new CommandSubsystem(this);
-    private StorageSubsystem storage = new StorageSubsystem(this);
-    public UtilitySubsystem utilities = new UtilitySubsystem(this);
-
-    // saved
-    public ArrayList<InternetAddressRecord> internetAddressRecords = new ArrayList<>();
+    private static AlternateAccountFinder instance;
 
     @Override
     public void onEnable() {
-        storage.load();
+        instance = this;
+        StorageManager.getInstance().load();
         this.getServer().getPluginManager().registerEvents(this, this);
     }
 
     @Override
     public void onDisable() {
-        storage.save();
+        StorageManager.getInstance().save();
+    }
+
+    public static AlternateAccountFinder getInstance() {
+        return instance;
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        return commandInterpreter.interpretCommand(sender, label, args);
+        return CommandInterpreter.getInstance().interpretCommand(sender, label, args);
     }
 
     @EventHandler()

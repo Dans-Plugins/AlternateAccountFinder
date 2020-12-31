@@ -1,22 +1,28 @@
-package detectionsystem.Subsystems;
+package detectionsystem;
 
-import detectionsystem.AlternateAccountFinder;
-import detectionsystem.Commands.ListCommand;
+import detectionsystem.commands.ListCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class CommandSubsystem {
+public class CommandInterpreter {
 
-    AlternateAccountFinder main = null;
+    private static CommandInterpreter instance;
 
-    public CommandSubsystem(AlternateAccountFinder plugin) {
-        main = plugin;
+    private CommandInterpreter() {
+
+    }
+
+    public static CommandInterpreter getInstance() {
+        if (instance == null) {
+            instance = new CommandInterpreter();
+        }
+        return instance;
     }
 
     public boolean interpretCommand(CommandSender sender, String label, String[] args) {
         switch(label) {
             case "aaflist":
-                ListCommand command = new ListCommand(main);
+                ListCommand command = new ListCommand();
                 command.showInfo(sender, args);
                 break;
             default:

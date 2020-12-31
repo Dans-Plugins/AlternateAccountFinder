@@ -1,7 +1,8 @@
-package detectionsystem.EventHandlers;
+package detectionsystem.eventhandlers;
 
 import detectionsystem.AlternateAccountFinder;
-import detectionsystem.Objects.InternetAddressRecord;
+import detectionsystem.data.PersistentData;
+import detectionsystem.objects.InternetAddressRecord;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -15,11 +16,11 @@ public class PlayerJoinEventHandler {
 
     public void handle(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        InternetAddressRecord record = main.utilities.getInternetAddressRecord(player.getAddress().getAddress());
+        InternetAddressRecord record = PersistentData.getInstance().getInternetAddressRecord(player.getAddress().getAddress());
         if (record == null) { // no record of this IP address exists, create one
             System.out.println(player.getName() + " has joined with a new IP address. Creating record.");
             InternetAddressRecord newRecord = new InternetAddressRecord(player);
-            main.internetAddressRecords.add(newRecord);
+            PersistentData.getInstance().getInternetAddressRecords().add(newRecord);
         }
         else { // record exists
             if (record.getLogins(player.getUniqueId()) == 0) { // IP address has been used before, but not with this account, add the uuid.

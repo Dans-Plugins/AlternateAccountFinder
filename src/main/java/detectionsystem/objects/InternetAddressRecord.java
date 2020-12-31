@@ -1,4 +1,4 @@
-package detectionsystem.Objects;
+package detectionsystem.objects;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Type;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,7 +1,7 @@
-package detectionsystem.Commands;
+package detectionsystem.commands;
 
-import detectionsystem.AlternateAccountFinder;
-import detectionsystem.Objects.InternetAddressRecord;
+import detectionsystem.data.PersistentData;
+import detectionsystem.objects.InternetAddressRecord;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -9,12 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ListCommand {
-
-    AlternateAccountFinder main = null;
-
-    public ListCommand(AlternateAccountFinder plugin) {
-        main = plugin;
-    }
 
     public void showInfo(CommandSender sender, String[] args) {
 
@@ -51,7 +45,7 @@ public class ListCommand {
 
     public void listSuspected(Player player) {
         int count = 0;
-        for (InternetAddressRecord record : main.internetAddressRecords) {
+        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("suspected")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + " [" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
@@ -66,7 +60,7 @@ public class ListCommand {
 
     public void listProbable(Player player) {
         int count = 0;
-        for (InternetAddressRecord record : main.internetAddressRecords) {
+        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("probable")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + " [" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
@@ -80,7 +74,7 @@ public class ListCommand {
     }
 
     public void listAddresses(Player player) {
-        for (InternetAddressRecord record : main.internetAddressRecords) {
+        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
             player.sendMessage(ChatColor.AQUA + "" + record.getIP().toString().substring(1));
         }
     }

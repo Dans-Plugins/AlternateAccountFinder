@@ -1,5 +1,5 @@
 name: AlternateAccountFinder
-version: 1.0
+version: 1.1
 author: DanTheTechMan
 main: detectionsystem.AlternateAccountFinder
 api-version: 1.13
