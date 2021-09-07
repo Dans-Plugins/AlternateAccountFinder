@@ -11,9 +11,9 @@ An open source minecraft plugin that attempts to identify accounts that have use
 3) Restart your server.
 
 ## Usage
-- [User Guide](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/Guide)
-- [List of Commands](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/Commands)
-- [FAQ](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/FAQ)
+- [User Guide](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/Guide) (coming soon)
+- [List of Commands](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/Commands) (coming soon)
+- [FAQ](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/FAQ) (coming soon)
 
 ## Support
 You can find the support discord server [here](https://discord.gg/xXtuAQ2).
