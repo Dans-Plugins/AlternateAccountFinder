@@ -27,7 +27,7 @@ Please fill out a bug report [here](https://github.com/dmccoystephenson/Alternat
 - [Planned Improvements](https://github.com/dmccoystephenson/AlternateAccountFinder/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)
 
 ## Contributing
-- [Notes for Developers (coming soon)](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/Developer-Notes)
+- [Notes for Developers](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/Developer-Notes)
 
 ## Authors and acknowledgement
 Name | Main Contributions
