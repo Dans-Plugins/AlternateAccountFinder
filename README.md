@@ -42,7 +42,3 @@ This project is in active development.
 
 ### bStats
 You can view the bStats page for the plugin [here](https://bstats.org/plugin/bukkit/Alternate%20Account%20Finder/9834).
-
-# Version History
-- v1.0 - "Initial Release"
-- v1.1 - "bStats, Search Command" update
