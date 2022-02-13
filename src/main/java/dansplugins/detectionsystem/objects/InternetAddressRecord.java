@@ -3,7 +3,7 @@ package dansplugins.detectionsystem.objects;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dansplugins.detectionsystem.UUIDChecker;
+import dansplugins.detectionsystem.utils.UUIDChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

@@ -1,4 +1,4 @@
-package dansplugins.detectionsystem;
+package dansplugins.detectionsystem.services;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StorageManager {
+public class LocalStorageService {
 
-    private static StorageManager instance;
+    private static LocalStorageService instance;
 
     private final static String FILE_PATH = "./plugins/AlternateAccountFinder/";
     private final static String RECORDS_FILE_NAME = "records.json";
@@ -25,13 +25,13 @@ public class StorageManager {
 
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();;
 
-    private StorageManager() {
+    private LocalStorageService() {
 
     }
 
-    public static StorageManager getInstance() {
+    public static LocalStorageService getInstance() {
         if (instance == null) {
-            instance = new StorageManager();
+            instance = new LocalStorageService();
         }
         return instance;
     }

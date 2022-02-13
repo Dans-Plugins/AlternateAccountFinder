@@ -2,6 +2,8 @@ package dansplugins.detectionsystem;
 
 import dansplugins.detectionsystem.bstats.Metrics;
 import dansplugins.detectionsystem.eventhandlers.PlayerJoinEventHandler;
+import dansplugins.detectionsystem.services.LocalCommandService;
+import dansplugins.detectionsystem.services.LocalStorageService;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
@@ -16,7 +18,7 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     @Override
     public void onEnable() {
         instance = this;
-        StorageManager.getInstance().load();
+        LocalStorageService.getInstance().load();
         this.getServer().getPluginManager().registerEvents(this, this);
 
         int pluginId = 9834;
@@ -25,7 +27,7 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
 
     @Override
     public void onDisable() {
-        StorageManager.getInstance().save();
+        LocalStorageService.getInstance().save();
     }
 
     public static AlternateAccountFinder getInstance() {
@@ -33,7 +35,7 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        return CommandInterpreter.getInstance().interpretCommand(sender, label, args);
+        return LocalCommandService.getInstance().interpretCommand(sender, label, args);
     }
 
     @EventHandler()

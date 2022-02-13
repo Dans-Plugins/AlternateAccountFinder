@@ -1,21 +1,21 @@
-package dansplugins.detectionsystem;
+package dansplugins.detectionsystem.services;
 
 import dansplugins.detectionsystem.commands.ListCommand;
 import dansplugins.detectionsystem.commands.SearchCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class CommandInterpreter {
+public class LocalCommandService {
 
-    private static CommandInterpreter instance;
+    private static LocalCommandService instance;
 
-    private CommandInterpreter() {
+    private LocalCommandService() {
 
     }
 
-    public static CommandInterpreter getInstance() {
+    public static LocalCommandService getInstance() {
         if (instance == null) {
-            instance = new CommandInterpreter();
+            instance = new LocalCommandService();
         }
         return instance;
     }
