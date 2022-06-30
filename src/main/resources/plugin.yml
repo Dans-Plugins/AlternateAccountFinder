@@ -1,5 +1,5 @@
 name: AlternateAccountFinder
-version: 1.1
+version: '${project.version}'
 author: DanTheTechMan
 main: dansplugins.detectionsystem.AlternateAccountFinder
 api-version: 1.13
