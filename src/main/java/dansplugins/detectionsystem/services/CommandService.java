@@ -2,32 +2,25 @@ package dansplugins.detectionsystem.services;
 
 import dansplugins.detectionsystem.commands.ListCommand;
 import dansplugins.detectionsystem.commands.SearchCommand;
+import dansplugins.detectionsystem.data.PersistentData;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class LocalCommandService {
+public class CommandService {
+    private final PersistentData persistentData;
 
-    private static LocalCommandService instance;
-
-    private LocalCommandService() {
-
-    }
-
-    public static LocalCommandService getInstance() {
-        if (instance == null) {
-            instance = new LocalCommandService();
-        }
-        return instance;
+    public CommandService(PersistentData persistentData) {
+        this.persistentData = persistentData;
     }
 
     public boolean interpretCommand(CommandSender sender, String label, String[] args) {
         switch(label) {
             case "aaflist":
-                ListCommand listCommand = new ListCommand();
+                ListCommand listCommand = new ListCommand(persistentData);
                 listCommand.showInfo(sender, args);
                 break;
             case "aafsearch":
-                SearchCommand searchCommand = new SearchCommand();
+                SearchCommand searchCommand = new SearchCommand(persistentData);
                 searchCommand.searchForPlayer(sender, args);
                 break;
             default:

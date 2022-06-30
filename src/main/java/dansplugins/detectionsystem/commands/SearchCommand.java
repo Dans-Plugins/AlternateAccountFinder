@@ -8,6 +8,11 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 
 public class SearchCommand {
+    private final PersistentData persistentData;
+
+    public SearchCommand(PersistentData persistentData) {
+        this.persistentData = persistentData;
+    }
 
     public void searchForPlayer(CommandSender sender, String[] args) {
         if (!sender.hasPermission("aaf.search")) {
@@ -23,7 +28,7 @@ public class SearchCommand {
         String playerName = args[0];
 
         // search
-        ArrayList<InternetAddressRecord> list = PersistentData.getInstance().getInternetAddressRecordsAssociatedWithPlayer(playerName);
+        ArrayList<InternetAddressRecord> list = persistentData.getInternetAddressRecordsAssociatedWithPlayer(playerName);
 
         sendPlayerInfo(sender, list, playerName);
     }

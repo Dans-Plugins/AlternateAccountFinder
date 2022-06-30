@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import dansplugins.detectionsystem.data.PersistentData;
 import dansplugins.detectionsystem.objects.InternetAddressRecord;
+import dansplugins.detectionsystem.utils.UUIDChecker;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -14,26 +15,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LocalStorageService {
-
-    private static LocalStorageService instance;
+public class StorageService {
+    private final PersistentData persistentData;
+    private final UUIDChecker uuidChecker;
 
     private final static String FILE_PATH = "./plugins/AlternateAccountFinder/";
     private final static String RECORDS_FILE_NAME = "records.json";
 
     private final static Type LIST_MAP_TYPE = new TypeToken<ArrayList<HashMap<String, String>>>(){}.getType();
 
-    private Gson gson = new GsonBuilder().setPrettyPrinting().create();;
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();;
 
-    private LocalStorageService() {
-
-    }
-
-    public static LocalStorageService getInstance() {
-        if (instance == null) {
-            instance = new LocalStorageService();
-        }
-        return instance;
+    public StorageService(PersistentData persistentData, UUIDChecker uuidChecker) {
+        this.persistentData = persistentData;
+        this.uuidChecker = uuidChecker;
     }
 
     public void save() {
@@ -59,7 +54,7 @@ public class LocalStorageService {
 
     private void saveInternetAddressRecords() {
         List<Map<String, String>> records = new ArrayList<>();
-        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()){
+        for (InternetAddressRecord record : persistentData.getInternetAddressRecords()){
             records.add(record.save());
         }
 
@@ -68,13 +63,13 @@ public class LocalStorageService {
     }
 
     private void loadInternetAddressRecords() {
-        PersistentData.getInstance().getInternetAddressRecords().clear();
+        persistentData.getInternetAddressRecords().clear();
 
         ArrayList<HashMap<String, String>> data = loadDataFromFilename(FILE_PATH + RECORDS_FILE_NAME);
 
         for (Map<String, String> chunkData : data){
-            InternetAddressRecord record = new InternetAddressRecord(chunkData);
-            PersistentData.getInstance().getInternetAddressRecords().add(record);
+            InternetAddressRecord record = new InternetAddressRecord(chunkData, uuidChecker);
+            persistentData.getInternetAddressRecords().add(record);
         }
     }
 

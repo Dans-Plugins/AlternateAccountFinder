@@ -15,13 +15,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public class InternetAddressRecord {
+    private final UUIDChecker uuidChecker;
 
     private InetAddress IP = null;
     private ArrayList<UUID> uuids = new ArrayList<>();
     private HashMap<UUID, Integer> logins = new HashMap<>();
     private String flag = "none";
 
-    public InternetAddressRecord(Player player) {
+    public InternetAddressRecord(Player player, UUIDChecker uuidChecker) {
+        this.uuidChecker = uuidChecker;
         setIP(player.getAddress().getAddress());
         if (!uuids.contains(player.getUniqueId())) {
             uuids.add(player.getUniqueId());
@@ -29,7 +31,8 @@ public class InternetAddressRecord {
         }
     }
 
-    public InternetAddressRecord(Map<String, String> lockedBlockData) {
+    public InternetAddressRecord(Map<String, String> lockedBlockData, UUIDChecker uuidChecker) {
+        this.uuidChecker = uuidChecker;
         this.load(lockedBlockData);
     }
 
@@ -139,7 +142,7 @@ public class InternetAddressRecord {
     }
 
     public boolean hasPlayerLoggedIn(String playerName) {
-        UUID uuid = UUIDChecker.getInstance().findUUIDBasedOnPlayerName(playerName);
+        UUID uuid = uuidChecker.findUUIDBasedOnPlayerName(playerName);
 
         if (uuid == null) {
             return false;
@@ -151,7 +154,7 @@ public class InternetAddressRecord {
     public ArrayList<String> getPlayerNames() {
         ArrayList<String> toReturn = new ArrayList<>();
         for (UUID uuid : uuids) {
-            toReturn.add(UUIDChecker.getInstance().findPlayerNameBasedOnUUID(uuid));
+            toReturn.add(uuidChecker.findPlayerNameBasedOnUUID(uuid));
         }
         return toReturn;
     }
