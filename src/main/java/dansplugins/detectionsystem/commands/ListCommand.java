@@ -9,6 +9,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ListCommand {
+    private final PersistentData persistentData;
+
+    public ListCommand(PersistentData persistentData) {
+        this.persistentData = persistentData;
+    }
 
     public void showInfo(CommandSender sender, String[] args) {
 
@@ -45,7 +50,7 @@ public class ListCommand {
 
     public void listSuspected(Player player) {
         int count = 0;
-        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
+        for (InternetAddressRecord record : persistentData.getInternetAddressRecords()) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("suspected")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + " [" + record.getLogins(primary.getUniqueId()) + "] may have the following alternate accounts: "
@@ -60,7 +65,7 @@ public class ListCommand {
 
     public void listProbable(Player player) {
         int count = 0;
-        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
+        for (InternetAddressRecord record : persistentData.getInternetAddressRecords()) {
             OfflinePlayer primary = Bukkit.getOfflinePlayer(record.getPlayerUUIDWithMostLogins());
             if (record.getFlag().equalsIgnoreCase("probable")) {
                 player.sendMessage(ChatColor.AQUA + "" + primary.getName() + " [" + record.getLogins(primary.getUniqueId()) + "] likely has the following alternate accounts: "
@@ -74,7 +79,7 @@ public class ListCommand {
     }
 
     public void listAddresses(Player player) {
-        for (InternetAddressRecord record : PersistentData.getInstance().getInternetAddressRecords()) {
+        for (InternetAddressRecord record : persistentData.getInternetAddressRecords()) {
             player.sendMessage(ChatColor.AQUA + "" + record.getIP().toString().substring(1));
         }
     }

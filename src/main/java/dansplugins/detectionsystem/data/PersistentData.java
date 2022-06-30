@@ -6,21 +6,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class PersistentData {
-
-    private static PersistentData instance;
-
-    private ArrayList<InternetAddressRecord> internetAddressRecords = new ArrayList<>();
-
-    private PersistentData() {
-
-    }
-
-    public static PersistentData getInstance() {
-        if (instance == null) {
-            instance = new PersistentData();
-        }
-        return instance;
-    }
+    private final ArrayList<InternetAddressRecord> internetAddressRecords = new ArrayList<>();
 
     public ArrayList<InternetAddressRecord> getInternetAddressRecords() {
         return internetAddressRecords;
