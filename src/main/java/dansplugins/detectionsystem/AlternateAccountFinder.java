@@ -39,7 +39,7 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
 
     @EventHandler()
     public void onPlayerJoin(PlayerJoinEvent event) {
-        PlayerJoinEventHandler handler = new PlayerJoinEventHandler(persistentData);
+        PlayerJoinEventHandler handler = new PlayerJoinEventHandler(persistentData, uuidChecker);
         handler.handle(event);
     }
 }
