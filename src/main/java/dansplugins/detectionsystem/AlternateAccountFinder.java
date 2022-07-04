@@ -2,7 +2,7 @@ package dansplugins.detectionsystem;
 
 import dansplugins.detectionsystem.bstats.Metrics;
 import dansplugins.detectionsystem.data.PersistentData;
-import dansplugins.detectionsystem.eventhandlers.PlayerJoinEventHandler;
+import dansplugins.detectionsystem.listeners.PlayerJoinListener;
 import dansplugins.detectionsystem.services.CommandService;
 import dansplugins.detectionsystem.services.StorageService;
 import dansplugins.detectionsystem.utils.UUIDChecker;
@@ -39,7 +39,7 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
 
     @EventHandler()
     public void onPlayerJoin(PlayerJoinEvent event) {
-        PlayerJoinEventHandler handler = new PlayerJoinEventHandler(persistentData, uuidChecker);
+        PlayerJoinListener handler = new PlayerJoinListener(persistentData, uuidChecker);
         handler.handle(event);
     }
 }

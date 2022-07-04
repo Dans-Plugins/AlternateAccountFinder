@@ -1,4 +1,4 @@
-package dansplugins.detectionsystem.eventhandlers;
+package dansplugins.detectionsystem.listeners;
 
 import dansplugins.detectionsystem.data.PersistentData;
 import dansplugins.detectionsystem.objects.InternetAddressRecord;
@@ -6,11 +6,11 @@ import dansplugins.detectionsystem.utils.UUIDChecker;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-public class PlayerJoinEventHandler {
+public class PlayerJoinListener {
     private final PersistentData persistentData;
     private final UUIDChecker uuidChecker;
 
-    public PlayerJoinEventHandler(PersistentData persistentData, UUIDChecker uuidChecker) {
+    public PlayerJoinListener(PersistentData persistentData, UUIDChecker uuidChecker) {
         this.persistentData = persistentData;
         this.uuidChecker = uuidChecker;
     }
