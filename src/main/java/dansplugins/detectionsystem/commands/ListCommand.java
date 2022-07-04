@@ -29,16 +29,11 @@ public class ListCommand {
 
                     if (args[0].equalsIgnoreCase("probable")) {
                         listProbable(player);
-                        return;
-                    }
-
-                    if (args[0].equalsIgnoreCase("addresses")) {
-                        listAddresses(player);
                     }
 
                 }
                 else {
-                    player.sendMessage(ChatColor.RED + "Usage: /aaflist [suspected | probable | addresses]");
+                    player.sendMessage(ChatColor.RED + "Usage: /aaflist [suspected | probable ]");
                 }
             }
             else {
@@ -75,12 +70,6 @@ public class ListCommand {
         }
         if (count == 0) {
             player.sendMessage(ChatColor.GREEN + "No probable alternate accounts!");
-        }
-    }
-
-    public void listAddresses(Player player) {
-        for (InternetAddressRecord record : persistentData.getInternetAddressRecords()) {
-            player.sendMessage(ChatColor.AQUA + "" + record.getIP().toString().substring(1));
         }
     }
 
