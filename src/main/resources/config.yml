@@ -1,0 +1,8 @@
+database:
+  url: 'jdbc:h2:./plugins/AlternateAccountFinder/aaf;AUTO_SERVER=true;MODE=MYSQL;DATABASE_TO_UPPER=false'
+  dialect: H2
+  username: 'sa'
+  password: ''
+notify-users:
+  - 0a9fa342-3139-49d7-8acb-fcf4d9c1f0ef
+  - 3fcad669-b828-4d6d-be88-1c28b067c5d8
