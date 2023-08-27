@@ -1,11 +1,13 @@
 package com.dansplugins.detectionsystem.commands;
 
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static net.md_5.bungee.api.ChatColor.*;
 import static net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND;
 import static net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT;
 
 import com.dansplugins.detectionsystem.AlternateAccountFinder;
-import com.dansplugins.detectionsystem.logins.AddressInfo;
+import com.dansplugins.detectionsystem.logins.AccountInfo;
+import com.dansplugins.detectionsystem.logins.AddressAccountInfo;
 import com.dansplugins.detectionsystem.logins.LoginService;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -55,7 +57,7 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
             }
 
             LoginService loginService = plugin.getLoginService();
-            AddressInfo addressInfo = loginService.getAddressInfo(ip);
+            AddressAccountInfo addressInfo = loginService.getAddressInfo(ip);
 
             List<UUID> accounts = addressInfo.getAccounts();
             if (accounts.isEmpty()) {
@@ -66,6 +68,7 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(WHITE + "Accounts for " + ip.getHostAddress() + ":");
             accounts.forEach(uuid -> {
                 OfflinePlayer player = plugin.getServer().getOfflinePlayer(uuid);
+                AccountInfo accountInfo = addressInfo.getAccountInfo(uuid);
                 sender.spigot().sendMessage(
                         Stream.of(
                                 new ComponentBuilder("• ").color(GRAY).create(),
@@ -74,7 +77,10 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
                                         .event(new HoverEvent(SHOW_TEXT, new Text("Click here to view other IPs for this account")))
                                         .event(new ClickEvent(RUN_COMMAND, "/aaf ips " + player.getName()))
                                         .create(),
-                                new ComponentBuilder(" (" + addressInfo.getLogins(uuid) + " logins)").color(GRAY).create()
+                                new ComponentBuilder(" (" + accountInfo.getLogins() + " logins, first login "
+                                        + ISO_LOCAL_DATE_TIME.format(accountInfo.getFirstLogin())
+                                        + ", last login " + ISO_LOCAL_DATE_TIME.format(accountInfo.getLastLogin())
+                                        + ")").color(GRAY).create()
                         ).flatMap(Arrays::stream).toArray(BaseComponent[]::new)
                 );
             });

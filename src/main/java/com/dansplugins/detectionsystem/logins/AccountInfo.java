@@ -1,35 +1,29 @@
 package com.dansplugins.detectionsystem.logins;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 public final class AccountInfo {
-    private final UUID minecraftUuid;
-    private final Map<InetAddress, Integer> logins;
 
-    public AccountInfo(UUID minecraftUuid, Map<InetAddress, Integer> logins) {
-        this.minecraftUuid = minecraftUuid;
+    private final int logins;
+    private final LocalDateTime firstLogin;
+    private final LocalDateTime lastLogin;
+
+    public AccountInfo(int logins, LocalDateTime firstLogin, LocalDateTime lastLogin) {
         this.logins = logins;
+        this.firstLogin = firstLogin;
+        this.lastLogin = lastLogin;
     }
 
-    public UUID getMinecraftUuid() {
-        return minecraftUuid;
+    public int getLogins() {
+        return logins;
     }
 
-    public Player getPlayer() {
-        return Bukkit.getPlayer(minecraftUuid);
+    public LocalDateTime getFirstLogin() {
+        return firstLogin;
     }
 
-    public int getLogins(InetAddress address) {
-        return logins.getOrDefault(address, 0);
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
     }
 
-    public List<InetAddress> getAddresses() {
-        return logins.keySet().stream().toList();
-    }
 }

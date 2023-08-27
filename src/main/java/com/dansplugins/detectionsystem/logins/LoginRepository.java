@@ -25,29 +25,33 @@ public final class LoginRepository {
         this.dsl = dsl;
     }
 
-    public AddressInfo getAddressInfo(InetAddress ip) {
+    public AddressAccountInfo getAddressInfo(InetAddress ip) {
         Result<AafLoginRecordRecord> result = dsl.selectFrom(AAF_LOGIN_RECORD)
                 .where(AAF_LOGIN_RECORD.ADDRESS.eq(ip.getHostAddress()))
                 .fetch();
 
-        return new AddressInfo(
+        return new AddressAccountInfo(
                 ip,
                 result.stream()
                         .collect(
                                 Collectors.toMap(
                                         record -> UUID.fromString(record.getMinecraftUuid()),
-                                        AafLoginRecordRecord::getLogins
+                                        record -> new AccountInfo(
+                                                record.getLogins(),
+                                                record.getFirstLogin(),
+                                                record.getLastLogin()
+                                        )
                                 )
                         )
         );
     }
 
-    public AccountInfo getAccountInfo(UUID minecraftUuid) {
+    public AccountAddressInfo getAccountInfo(UUID minecraftUuid) {
         Result<AafLoginRecordRecord> result = dsl.selectFrom(AAF_LOGIN_RECORD)
                 .where(AAF_LOGIN_RECORD.MINECRAFT_UUID.eq(minecraftUuid.toString()))
                 .fetch();
 
-        return new AccountInfo(
+        return new AccountAddressInfo(
                 minecraftUuid,
                 result.stream().collect(
                         Collectors.toMap(
@@ -58,7 +62,11 @@ public final class LoginRepository {
                                         throw new RuntimeException(exception);
                                     }
                                 },
-                                AafLoginRecordRecord::getLogins
+                                record -> new AddressInfo(
+                                        record.getLogins(),
+                                        record.getFirstLogin(),
+                                        record.getLastLogin()
+                                )
                         )
                 )
         );

@@ -14,11 +14,11 @@ public final class LoginService {
         this.repo = repo;
     }
 
-    public AddressInfo getAddressInfo(InetAddress ip) {
+    public AddressAccountInfo getAddressInfo(InetAddress ip) {
         return repo.getAddressInfo(ip);
     }
 
-    public AccountInfo getAccountInfo(UUID minecraftUuid) {
+    public AccountAddressInfo getAccountInfo(UUID minecraftUuid) {
         return repo.getAccountInfo(minecraftUuid);
     }
 

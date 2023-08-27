@@ -1,11 +1,13 @@
 package com.dansplugins.detectionsystem.commands;
 
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static net.md_5.bungee.api.ChatColor.*;
 import static net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND;
 import static net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT;
 
 import com.dansplugins.detectionsystem.AlternateAccountFinder;
-import com.dansplugins.detectionsystem.logins.AccountInfo;
+import com.dansplugins.detectionsystem.logins.AccountAddressInfo;
+import com.dansplugins.detectionsystem.logins.AddressInfo;
 import com.dansplugins.detectionsystem.logins.LoginService;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -47,9 +49,9 @@ public final class AafIpsCommand implements CommandExecutor, TabCompleter {
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             LoginService loginService = plugin.getLoginService();
-            AccountInfo addressInfo = loginService.getAccountInfo(player.getUniqueId());
+            AccountAddressInfo accountAddressInfo = loginService.getAccountInfo(player.getUniqueId());
 
-            List<InetAddress> addresses = addressInfo.getAddresses();
+            List<InetAddress> addresses = accountAddressInfo.getAddresses();
             if (addresses.isEmpty()) {
                 sender.sendMessage(RED + "No IP addresses found for " + player.getName());
                 return;
@@ -57,6 +59,7 @@ public final class AafIpsCommand implements CommandExecutor, TabCompleter {
 
             sender.sendMessage(WHITE + "Addresses for " + player.getName() + ":");
             addresses.forEach(ip -> {
+                AddressInfo addressInfo = accountAddressInfo.getAddressInfo(ip);
                 sender.spigot().sendMessage(
                         Stream.of(
                             new ComponentBuilder("• ").color(GRAY).create(),
@@ -65,7 +68,10 @@ public final class AafIpsCommand implements CommandExecutor, TabCompleter {
                                     .event(new HoverEvent(SHOW_TEXT, new Text("Click here to view other accounts for this IP address")))
                                     .event(new ClickEvent(RUN_COMMAND, "/aaf accounts " + ip.getHostAddress()))
                                     .create(),
-                            new ComponentBuilder(" (" + addressInfo.getLogins(ip) + " logins)").color(GRAY).create()
+                                new ComponentBuilder(" (" + addressInfo.getLogins() + " logins, first login "
+                                        + ISO_LOCAL_DATE_TIME.format(addressInfo.getFirstLogin())
+                                        + ", last login " + ISO_LOCAL_DATE_TIME.format(addressInfo.getLastLogin())
+                                        + ")").color(GRAY).create()
                         ).flatMap(Arrays::stream).toArray(BaseComponent[]::new)
                 );
             });
