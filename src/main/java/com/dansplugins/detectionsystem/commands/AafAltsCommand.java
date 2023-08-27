@@ -48,6 +48,11 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
             LoginService loginService = plugin.getLoginService();
             List<UUID> potentialAlts = loginService.getPotentialAlts(player.getUniqueId());
 
+            if (potentialAlts.isEmpty()) {
+                sender.sendMessage(RED + "No potential alts found for " + player.getName());
+                return;
+            }
+
             sender.sendMessage(WHITE + "Potential alts for " + player.getName() + ":");
             potentialAlts.forEach(uuid -> {
                 OfflinePlayer alt = plugin.getServer().getOfflinePlayer(uuid);
