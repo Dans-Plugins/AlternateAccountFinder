@@ -18,6 +18,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -48,8 +49,14 @@ public final class AafIpsCommand implements CommandExecutor, TabCompleter {
             LoginService loginService = plugin.getLoginService();
             AccountInfo addressInfo = loginService.getAccountInfo(player.getUniqueId());
 
+            List<InetAddress> addresses = addressInfo.getAddresses();
+            if (addresses.isEmpty()) {
+                sender.sendMessage(RED + "No IP addresses found for " + player.getName());
+                return;
+            }
+
             sender.sendMessage(WHITE + "Addresses for " + player.getName() + ":");
-            addressInfo.getAddresses().forEach(ip -> {
+            addresses.forEach(ip -> {
                 sender.spigot().sendMessage(
                         Stream.of(
                             new ComponentBuilder("• ").color(GRAY).create(),
