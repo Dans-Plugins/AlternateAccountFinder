@@ -1,0 +1,144 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'nu.studer.jooq' version '8.2.1'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenLocal()
+    maven { url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/') }
+    maven { url = uri('https://oss.sonatype.org/content/groups/public/') }
+    maven { url = uri('https://repo.maven.apache.org/maven2/') }
+    maven { url = uri('https://jitpack.io') }
+    maven { url = uri('https://repo.rpkit.com/repository/maven-public/' )}
+}
+
+dependencies {
+    implementation 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    implementation 'org.bstats:bstats-bukkit:3.0.2'
+    implementation 'org.jooq:jooq:3.18.6'
+    implementation 'org.flywaydb:flyway-core:9.19.0'
+    implementation 'org.flywaydb:flyway-mysql:9.19.0'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+    implementation 'com.h2database:h2:2.2.220'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'com.github.Dans-Plugins:Mailboxes:v1.1'
+    implementation 'com.rpkit:rpk-core-bukkit:2.4.2:all'
+    implementation 'com.rpkit:rpk-player-lib-bukkit:2.4.2:all'
+    implementation 'com.rpkit:rpk-notification-lib-bukkit:2.4.2:all'
+    jooqGenerator 'org.jooq:jooq-meta-extensions:3.18.6'
+}
+
+group = 'com.dansplugins'
+version = '2.0.0-SNAPSHOT'
+description = 'AlternateAccountFinder'
+java.sourceCompatibility = JavaVersion.VERSION_17
+
+shadowJar {
+    mergeServiceFiles()
+    dependencies {
+        include(dependency('org.bstats:bstats-bukkit'))
+        include(dependency('org.bstats:bstats-base'))
+        include(dependency('org.jooq:jooq'))
+        include(dependency('io.r2dbc:r2dbc-spi'))
+        include(dependency('org.reactivestreams:reactive-streams'))
+        include(dependency('org.flywaydb:flyway-core'))
+        include(dependency('com.google.code.gson:gson'))
+        include(dependency('org.flywaydb:flyway-mysql'))
+        include(dependency('org.mariadb.jdbc:mariadb-java-client'))
+        include(dependency('com.github.waffla:waffle-jna'))
+        include(dependency('net.java.dev.jna:jna'))
+        include(dependency('net.java.dev.jna:jna-platform'))
+        include(dependency('org.slf4j:jcl-over-slf4j'))
+        include(dependency('com.github.ben-manes.caffeine:caffeine'))
+        include(dependency('org.checkerframework:checker-qual'))
+        include(dependency('com.google.errorprone:error_prone_annotations'))
+        include(dependency('com.h2database:h2:2.2.220'))
+        include(dependency('com.zaxxer:HikariCP:5.0.1'))
+    }
+
+    relocate 'assets.report', 'com.dansplugins.detectionsystem.shadow.assets.report'
+    relocate 'com.github', 'com.dansplugins.detectionsystem.shadow.com.github'
+    relocate 'com.google', 'com.dansplugins.detectionsystem.shadow.com.google'
+    relocate 'com.sun', 'com.dansplugins.detectionsystem.shadow.com.sun'
+    relocate 'com.zaxxer', 'com.dansplugins.detectionsystem.shadow.com.zaxxer'
+    relocate 'io.r2dbc', 'com.dansplugins.detectionsystem.shadow.io.r2dbc'
+    relocate 'org.apache', 'com.dansplugins.detectionsystem.shadow.org.apache'
+    relocate 'org.checkerframework', 'com.dansplugins.detectionsystem.shadow.org.checkerframework'
+    relocate 'org.bstats', 'com.dansplugins.detectionsystem.shadow.org.bstats'
+    relocate 'org.flywaydb', 'com.dansplugins.detectionsystem.shadow.org.flywaydb'
+    relocate 'org.h2', 'com.dansplugins.detectionsystem.shadow.org.h2'
+    relocate 'org.jooq', 'com.dansplugins.detectionsystem.shadow.org.jooq'
+    relocate 'org.mariadb', 'com.dansplugins.detectionsystem.shadow.org.mariadb'
+    relocate 'org.reactivestreams', 'com.dansplugins.detectionsystem.shadow.org.reactivestreams'
+}
+
+jooq {
+    configurations {
+        main {
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.extensions.ddl.DDLDatabase'
+                        inputSchema = 'PUBLIC'
+                        includes = '.*'
+                        excludes = ''
+                        properties {
+                            property {
+                                key = "scripts"
+                                value = "src/main/resources/com/dansplugins/detectionsystem/db/migration"
+                            }
+                            property {
+                                key = "sort"
+                                value = "semantic"
+                            }
+                            property {
+                                key = "defaultNameCase"
+                                value = "lower"
+                            }
+                        }
+                    }
+                    target {
+                        packageName = 'com.dansplugins.detectionsystem.jooq'
+                    }
+                }
+            }
+        }
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+artifacts {
+    archives shadowJar
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = project.group
+            artifactId = project.name
+            version = project.version
+
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}

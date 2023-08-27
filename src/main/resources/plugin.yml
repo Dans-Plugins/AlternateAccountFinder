@@ -1,15 +1,26 @@
 name: AlternateAccountFinder
-version: '${project.version}'
-author: DanTheTechMan
-main: dansplugins.detectionsystem.AlternateAccountFinder
-api-version: 1.13
+version: '${version}'
+authors:
+- DanTheTechMan
+- alyphen
+main: com.dansplugins.detectionsystem.AlternateAccountFinder
+api-version: 1.17
 
 commands:
-  aaflist:
-  aafsearch:
+  aaf:
+    description: |
+      Alternate Account Finder commands
+      /aaf accounts [ip] - Lists all accounts that have logged in from the specified IP
+      /aaf ips [player] - Lists all IPs that the specified player has logged in from
+      /aaf alts [player] - Lists the suspected alts of a specified player
 
 permissions:
-  aaf.list:
+  aaf.accounts:
+    description: Allows the user to view accounts for an IP
     default: op
-  aaf.search:
+  aaf.ips:
+    description: Allows the user to view IPs for a player
+    default: op
+  aaf.alts:
+    description: Allows the user to view alts for a player
     default: op

@@ -30,9 +30,10 @@ Please fill out a bug report [here](https://github.com/dmccoystephenson/Alternat
 - [Notes for Developers](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/Developer-Notes)
 
 ## Authors and acknowledgement
-Name | Main Contributions
------------- | -------------
-Daniel Stephenson | Creator
+| Name              | Main Contributions |
+|-------------------|--------------------|
+| Daniel Stephenson | Creator            |
+| Ren Binden        | v2                 |
 
 ## License
 GPL3
