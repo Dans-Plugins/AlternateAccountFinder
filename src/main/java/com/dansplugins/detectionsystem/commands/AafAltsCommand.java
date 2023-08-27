@@ -60,7 +60,7 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
                         Stream.of(
                                 new ComponentBuilder("• ").color(GRAY).create(),
                                 new ComponentBuilder(alt.getName())
-                                        .color(YELLOW)
+                                        .color(alt.isBanned() ? RED : YELLOW)
                                         .event(new HoverEvent(SHOW_TEXT, new Text("Click here to view other IPs for this account")))
                                         .event(new ClickEvent(RUN_COMMAND, "/aaf ips " + alt.getName()))
                                         .create()

@@ -73,7 +73,7 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
                         Stream.of(
                                 new ComponentBuilder("• ").color(GRAY).create(),
                                 new ComponentBuilder(player.getName())
-                                        .color(YELLOW)
+                                        .color(player.isBanned() ? RED : YELLOW)
                                         .event(new HoverEvent(SHOW_TEXT, new Text("Click here to view other IPs for this account")))
                                         .event(new ClickEvent(RUN_COMMAND, "/aaf ips " + player.getName()))
                                         .create(),
