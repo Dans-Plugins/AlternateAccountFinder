@@ -64,7 +64,7 @@ public final class AafIpsCommand implements CommandExecutor, TabCompleter {
                         Stream.of(
                             new ComponentBuilder("• ").color(GRAY).create(),
                             new ComponentBuilder(ip.getHostAddress())
-                                    .color(player.isBanned() ? RED : YELLOW)
+                                    .color(plugin.getServer().getIPBans().contains(ip.getHostAddress()) ? RED : YELLOW)
                                     .event(new HoverEvent(SHOW_TEXT, new Text("Click here to view other accounts for this IP address")))
                                     .event(new ClickEvent(RUN_COMMAND, "/aaf accounts " + ip.getHostAddress()))
                                     .create(),
