@@ -84,6 +84,9 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (!sender.hasPermission("aaf.accounts")) {
+            return List.of();
+        }
         if (args.length == 0) {
             return plugin.getServer().getOnlinePlayers().stream().map(player -> player.getAddress().getAddress().getHostAddress()).toList();
         } else if (args.length == 1) {

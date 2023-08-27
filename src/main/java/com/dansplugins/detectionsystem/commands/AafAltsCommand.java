@@ -73,6 +73,9 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (!sender.hasPermission("aaf.alts")) {
+            return List.of();
+        }
         if (args.length == 0) {
             return Arrays.stream(plugin.getServer().getOfflinePlayers()).map(OfflinePlayer::getName).toList();
         } else if (args.length == 1) {
