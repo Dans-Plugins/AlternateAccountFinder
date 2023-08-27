@@ -60,12 +60,13 @@ public final class AafIpsCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(WHITE + "Addresses for " + player.getName() + ":");
             addresses.forEach(ip -> {
                 AddressInfo addressInfo = accountAddressInfo.getAddressInfo(ip);
+                boolean isIpBanned = plugin.getServer().getIPBans().contains(ip.getHostAddress());
                 sender.spigot().sendMessage(
                         Stream.of(
                             new ComponentBuilder("• ").color(GRAY).create(),
                             new ComponentBuilder(ip.getHostAddress())
-                                    .color(plugin.getServer().getIPBans().contains(ip.getHostAddress()) ? RED : YELLOW)
-                                    .event(new HoverEvent(SHOW_TEXT, new Text("Click here to view other accounts for this IP address")))
+                                    .color(isIpBanned ? RED : YELLOW)
+                                    .event(new HoverEvent(SHOW_TEXT, new Text((isIpBanned ? "This IP is banned. " : "") + "Click here to view other accounts for this IP address")))
                                     .event(new ClickEvent(RUN_COMMAND, "/aaf accounts " + ip.getHostAddress()))
                                     .create(),
                                 new ComponentBuilder(" (" + addressInfo.getLogins() + " logins, first login "
