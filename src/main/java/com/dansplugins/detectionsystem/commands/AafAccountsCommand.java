@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
@@ -56,8 +57,14 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
             LoginService loginService = plugin.getLoginService();
             AddressInfo addressInfo = loginService.getAddressInfo(ip);
 
+            List<UUID> accounts = addressInfo.getAccounts();
+            if (accounts.isEmpty()) {
+                sender.sendMessage(RED + "No accounts found for " + ip.getHostAddress());
+                return;
+            }
+
             sender.sendMessage(WHITE + "Accounts for " + ip.getHostAddress() + ":");
-            addressInfo.getAccounts().forEach(uuid -> {
+            accounts.forEach(uuid -> {
                 OfflinePlayer player = plugin.getServer().getOfflinePlayer(uuid);
                 sender.spigot().sendMessage(
                         Stream.of(
