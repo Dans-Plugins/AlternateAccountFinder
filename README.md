@@ -29,6 +29,14 @@ Please fill out a bug report [here](https://github.com/dmccoystephenson/Alternat
 ## Contributing
 - [Notes for Developers](https://github.com/dmccoystephenson/AlternateAccountFinder/wiki/Developer-Notes)
 
+### Docker
+To build the plugin & spin up a test server, run the following command:
+```bash
+docker-compose up
+```
+
+This requires [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) to be installed.
+
 ## Authors and acknowledgement
 | Name              | Main Contributions |
 |-------------------|--------------------|

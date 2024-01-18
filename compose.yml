@@ -1,0 +1,7 @@
+services:
+  testmcserver:
+    build: .
+    image: aaf-test-mc-server
+    container_name: aaf-test-mc-server
+    ports:
+      - "25565:25565"
