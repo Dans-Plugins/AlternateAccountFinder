@@ -3,6 +3,7 @@ package com.dansplugins.detectionsystem;
 import static java.util.logging.Level.SEVERE;
 
 import com.dansplugins.detectionsystem.commands.AafCommand;
+import com.dansplugins.detectionsystem.encryption.IpEncryption;
 import com.dansplugins.detectionsystem.listeners.PlayerJoinListener;
 import com.dansplugins.detectionsystem.logins.LoginRepository;
 import com.dansplugins.detectionsystem.logins.LoginService;
@@ -80,8 +81,11 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
                 jooqSettings
         );
 
+        // Encryption
+        IpEncryption ipEncryption = new IpEncryption(getLogger());
+
         // Repositories
-        LoginRepository loginRepository = new LoginRepository(dsl);
+        LoginRepository loginRepository = new LoginRepository(dsl, ipEncryption);
 
         // Services
         loginService = new LoginService(loginRepository);
