@@ -3,6 +3,7 @@ package com.dansplugins.detectionsystem.logins;
 import static com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD;
 import static java.time.ZoneOffset.UTC;
 
+import com.dansplugins.detectionsystem.encryption.IpEncryption;
 import com.dansplugins.detectionsystem.jooq.tables.AafLoginRecord;
 import com.dansplugins.detectionsystem.jooq.tables.records.AafLoginRecordRecord;
 import org.bukkit.entity.Player;
@@ -20,14 +21,17 @@ import java.util.stream.Collectors;
 public final class LoginRepository {
 
     private final DSLContext dsl;
+    private final IpEncryption ipEncryption;
 
-    public LoginRepository(DSLContext dsl) {
+    public LoginRepository(DSLContext dsl, IpEncryption ipEncryption) {
         this.dsl = dsl;
+        this.ipEncryption = ipEncryption;
     }
 
     public AddressAccountInfo getAddressInfo(InetAddress ip) {
+        String encryptedAddress = ipEncryption.encrypt(ip.getHostAddress());
         Result<AafLoginRecordRecord> result = dsl.selectFrom(AAF_LOGIN_RECORD)
-                .where(AAF_LOGIN_RECORD.ADDRESS.eq(ip.getHostAddress()))
+                .where(AAF_LOGIN_RECORD.ADDRESS.eq(encryptedAddress))
                 .fetch();
 
         return new AddressAccountInfo(
@@ -57,7 +61,8 @@ public final class LoginRepository {
                         Collectors.toMap(
                                 record -> {
                                     try {
-                                        return InetAddress.getByName(record.getAddress());
+                                        String decryptedAddress = ipEncryption.decrypt(record.getAddress());
+                                        return InetAddress.getByName(decryptedAddress);
                                     } catch (UnknownHostException exception) {
                                         throw new RuntimeException(exception);
                                     }
@@ -92,9 +97,10 @@ public final class LoginRepository {
     }
 
     public int getLoginCount(UUID minecraftUuid, InetAddress ip) {
+        String encryptedAddress = ipEncryption.encrypt(ip.getHostAddress());
         return dsl.selectFrom(AAF_LOGIN_RECORD)
                 .where(AAF_LOGIN_RECORD.MINECRAFT_UUID.eq(minecraftUuid.toString()))
-                .and(AAF_LOGIN_RECORD.ADDRESS.eq(ip.getHostAddress()))
+                .and(AAF_LOGIN_RECORD.ADDRESS.eq(encryptedAddress))
                 .fetchOne(AAF_LOGIN_RECORD.LOGINS);
     }
 
@@ -103,9 +109,10 @@ public final class LoginRepository {
     }
 
     private void saveLogin(UUID minecraftUuid, InetAddress address) {
+        String encryptedAddress = ipEncryption.encrypt(address.getHostAddress());
         dsl.insertInto(AAF_LOGIN_RECORD)
                 .set(AAF_LOGIN_RECORD.MINECRAFT_UUID, minecraftUuid.toString())
-                .set(AAF_LOGIN_RECORD.ADDRESS, address.getHostAddress())
+                .set(AAF_LOGIN_RECORD.ADDRESS, encryptedAddress)
                 .set(AAF_LOGIN_RECORD.LOGINS, 1)
                 .set(AAF_LOGIN_RECORD.FIRST_LOGIN, LocalDateTime.now(UTC))
                 .set(AAF_LOGIN_RECORD.LAST_LOGIN, LocalDateTime.now(UTC))

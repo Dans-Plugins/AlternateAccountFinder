@@ -83,6 +83,9 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
 
         // Encryption
         IpEncryption ipEncryption = new IpEncryption(getLogger());
+        
+        // Migrate existing plaintext IP addresses to encrypted format
+        migrateExistingIpAddresses(dsl, ipEncryption);
 
         // Repositories
         LoginRepository loginRepository = new LoginRepository(dsl, ipEncryption);
@@ -115,5 +118,57 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
 
     public NotificationService getNotificationService() {
         return notificationService;
+    }
+    
+    /**
+     * Migrates existing plaintext IP addresses to encrypted format.
+     * This is a one-time operation that runs on startup after the encryption system is initialized.
+     */
+    private void migrateExistingIpAddresses(DSLContext dsl, IpEncryption ipEncryption) {
+        try {
+            // Check if migration is needed by looking for IP addresses that don't look like Base64
+            // Base64 strings will be much longer and contain only valid Base64 characters
+            int plaintextCount = dsl.selectCount()
+                    .from(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD)
+                    .where(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD.ADDRESS.notLike("%=%"))
+                    .and(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD.ADDRESS.length().lessThan(50))
+                    .fetchOne(0, int.class);
+                    
+            if (plaintextCount > 0) {
+                getLogger().info("Found " + plaintextCount + " plaintext IP addresses to encrypt");
+                
+                // Fetch all records with plaintext IPs
+                var records = dsl.selectFrom(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD)
+                        .where(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD.ADDRESS.notLike("%=%"))
+                        .and(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD.ADDRESS.length().lessThan(50))
+                        .fetch();
+                
+                int migrated = 0;
+                for (var record : records) {
+                    try {
+                        String plaintextIp = record.getAddress();
+                        String encryptedIp = ipEncryption.encrypt(plaintextIp);
+                        
+                        // Update the record with encrypted IP
+                        dsl.update(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD)
+                                .set(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD.ADDRESS, encryptedIp)
+                                .where(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD.MINECRAFT_UUID.eq(record.getMinecraftUuid()))
+                                .and(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD.ADDRESS.eq(plaintextIp))
+                                .execute();
+                        
+                        migrated++;
+                    } catch (Exception e) {
+                        getLogger().warning("Failed to encrypt IP for record: " + e.getMessage());
+                    }
+                }
+                
+                getLogger().info("Successfully migrated " + migrated + " IP addresses to encrypted format");
+            } else {
+                getLogger().info("No plaintext IP addresses found - migration not needed");
+            }
+        } catch (Exception e) {
+            getLogger().severe("Failed to migrate existing IP addresses: " + e.getMessage());
+            // Don't fail startup - the plugin can still function with new data
+        }
     }
 }
