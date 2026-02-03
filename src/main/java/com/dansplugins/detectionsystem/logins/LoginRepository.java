@@ -57,23 +57,31 @@ public final class LoginRepository {
 
         return new AccountAddressInfo(
                 minecraftUuid,
-                result.stream().collect(
-                        Collectors.toMap(
-                                record -> {
-                                    try {
-                                        String decryptedAddress = ipEncryption.decrypt(record.getAddress());
-                                        return InetAddress.getByName(decryptedAddress);
-                                    } catch (UnknownHostException exception) {
-                                        throw new RuntimeException(exception);
-                                    }
-                                },
-                                record -> new AddressInfo(
+                result.stream()
+                        .map(record -> {
+                            try {
+                                String decryptedAddress = ipEncryption.decrypt(record.getAddress());
+                                InetAddress address = InetAddress.getByName(decryptedAddress);
+                                AddressInfo info = new AddressInfo(
                                         record.getLogins(),
                                         record.getFirstLogin(),
                                         record.getLastLogin()
+                                );
+                                return new java.util.AbstractMap.SimpleEntry<>(address, info);
+                            } catch (UnknownHostException exception) {
+                                throw new RuntimeException("Invalid IP address in database", exception);
+                            } catch (RuntimeException exception) {
+                                // Log the specific record that failed but don't crash the entire operation
+                                // This allows partial data recovery if some records are corrupted
+                                throw new RuntimeException("Failed to decrypt IP for UUID " + minecraftUuid + ": " + exception.getMessage(), exception);
+                            }
+                        })
+                        .collect(
+                                Collectors.toMap(
+                                        java.util.Map.Entry::getKey,
+                                        java.util.Map.Entry::getValue
                                 )
                         )
-                )
         );
     }
 
@@ -98,10 +106,11 @@ public final class LoginRepository {
 
     public int getLoginCount(UUID minecraftUuid, InetAddress ip) {
         String encryptedAddress = ipEncryption.encrypt(ip.getHostAddress());
-        return dsl.selectFrom(AAF_LOGIN_RECORD)
+        Integer count = dsl.selectFrom(AAF_LOGIN_RECORD)
                 .where(AAF_LOGIN_RECORD.MINECRAFT_UUID.eq(minecraftUuid.toString()))
                 .and(AAF_LOGIN_RECORD.ADDRESS.eq(encryptedAddress))
                 .fetchOne(AAF_LOGIN_RECORD.LOGINS);
+        return count != null ? count : 0;
     }
 
     public void saveLogin(Player player) {
