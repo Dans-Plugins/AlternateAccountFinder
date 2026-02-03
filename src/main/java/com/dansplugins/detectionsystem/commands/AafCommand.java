@@ -19,14 +19,13 @@ public final class AafCommand implements CommandExecutor, TabCompleter {
     private final List<String> accountsAliases = List.of("accounts");
     private final List<String> altsAliases = List.of("alts");
 
-    private final List<String> subcommands = new ArrayList<>() {{
-        addAll(accountsAliases);
-        addAll(altsAliases);
-    }};
+    private final List<String> subcommands = new ArrayList<>();
 
     public AafCommand(AlternateAccountFinder plugin) {
         this.accountsCommand = new AafAccountsCommand(plugin);
         this.altsCommand = new AafAltsCommand(plugin);
+        subcommands.addAll(accountsAliases);
+        subcommands.addAll(altsAliases);
     }
 
     @Override
