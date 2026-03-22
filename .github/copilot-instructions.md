@@ -9,7 +9,7 @@ making any changes.
 - Language: Java
 - Build tool: Gradle (Groovy DSL) with Shadow plugin for fat JARs
 - Target platform: Spigot / Paper (API version 1.17+)
-- Test framework: JUnit 5
+- Test framework: Not yet configured (prefer JUnit 5; add dependencies in build.gradle before writing tests)
 - Database: jOOQ with Flyway migrations; H2 by default, MariaDB supported
 
 ## Project Structure
@@ -20,7 +20,7 @@ making any changes.
   - `logins/` – Business logic and repository for login/IP tracking
   - `notifications/` – Notification service integrations (Mailboxes, RPKit, message)
 - `src/main/resources/` – `plugin.yml`, `config.yml`, and database migration scripts
-- `src/test/java/` – Unit tests
+- `src/test/java/` – (intended) unit test sources; create this directory when adding tests
 
 ## Coding Conventions
 

@@ -32,8 +32,6 @@ You can find the support Discord server [here](https://discord.gg/xXtuAQ2).
 
 Please fill out a bug report [here](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/new).
 
-- [Known Bugs](https://github.com/Dans-Plugins/AlternateAccountFinder/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
-
 ## Contributing
 
 - [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -41,25 +39,25 @@ Please fill out a bug report [here](https://github.com/Dans-Plugins/AlternateAcc
 
 ## Testing
 
-### Unit Tests
+### Verification Build
 
 Linux:
 
 ```
-./gradlew clean test
+./gradlew clean build
 ```
 
 Windows:
 
 ```
-.\gradlew.bat clean test
+.\gradlew.bat clean build
 ```
 
-If you see `BUILD SUCCESSFUL`, the tests have passed.
+If you see `BUILD SUCCESSFUL`, the build has passed.
 
 ## Development
 
-### Test Server with Plugin Hot-Reloading
+### Test Server
 
 A Docker-based test server is available for development.
 
@@ -74,7 +72,7 @@ A Docker-based test server is available for development.
 docker compose down
 ```
 
-## Authors and Acknowledgement
+## Authors and Acknowledgements
 
 ### Developers
 

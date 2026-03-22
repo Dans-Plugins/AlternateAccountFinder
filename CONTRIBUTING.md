@@ -53,10 +53,10 @@ Update `src/main/resources/lang/` for any user-facing string changes.
 
 ## Testing
 
-Run the unit tests with:
+Run a verification build with:
 
-Linux: `./gradlew clean test`  
-Windows: `.\gradlew.bat clean test`
+Linux: `./gradlew clean build`  
+Windows: `.\gradlew.bat clean build`
 
 For manual testing, start a local Spigot server:
 
