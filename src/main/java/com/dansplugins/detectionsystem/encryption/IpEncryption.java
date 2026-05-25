@@ -108,7 +108,7 @@ public final class IpEncryption {
     
     /**
      * Decrypts an encrypted IP address string.
-     * 
+     *
      * @param encryptedIp Base64 encoded encrypted IP address
      * @return Decrypted IP address string
      * @throws IllegalArgumentException if encryptedIp is null or empty
@@ -118,22 +118,32 @@ public final class IpEncryption {
         if (encryptedIp == null || encryptedIp.trim().isEmpty()) {
             throw new IllegalArgumentException("Encrypted IP address must not be null or empty");
         }
-        
+
         try {
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            byte[] decoded = Base64.getDecoder().decode(encryptedIp);
-            byte[] decrypted = cipher.doFinal(decoded);
-            return new String(decrypted, StandardCharsets.UTF_8);
+            return decryptInternal(encryptedIp);
         } catch (Exception e) {
             logger.severe("Failed to decrypt IP address");
             throw new RuntimeException("IP decryption failed", e);
         }
     }
-    
+
+    /**
+     * Performs the raw decryption without logging. Used by both {@link #decrypt(String)}
+     * (which logs on failure) and {@link #isEncrypted(String)} (which expects failure
+     * for any plaintext input and should not log it as an error).
+     */
+    private String decryptInternal(String encryptedIp) throws Exception {
+        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        byte[] decoded = Base64.getDecoder().decode(encryptedIp);
+        byte[] decrypted = cipher.doFinal(decoded);
+        return new String(decrypted, StandardCharsets.UTF_8);
+    }
+
     /**
      * Checks if a given string appears to be an encrypted IP address by attempting to decrypt it.
-     * 
+     * Plaintext input is expected to fail decryption, so this method does not log failures.
+     *
      * @param address The address to check
      * @return true if the address can be successfully decrypted, false otherwise
      */
@@ -141,9 +151,9 @@ public final class IpEncryption {
         if (address == null || address.trim().isEmpty()) {
             return false;
         }
-        
+
         try {
-            decrypt(address);
+            decryptInternal(address);
             return true;
         } catch (Exception e) {
             return false;
