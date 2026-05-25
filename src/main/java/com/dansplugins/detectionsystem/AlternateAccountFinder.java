@@ -1,5 +1,6 @@
 package com.dansplugins.detectionsystem;
 
+import static com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD;
 import static java.util.logging.Level.SEVERE;
 
 import com.dansplugins.detectionsystem.commands.AafCommand;
@@ -23,6 +24,11 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class AlternateAccountFinder extends JavaPlugin implements Listener {
 
@@ -121,74 +127,82 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     }
     
     /**
+     * Marker file written next to the encryption key once every plaintext IP in the database has
+     * been migrated to ciphertext. Its presence lets subsequent startups skip the (otherwise
+     * O(total-login-records)) scan + per-record decrypt probe that {@link #migrateExistingIpAddresses}
+     * has to do to find unmigrated rows.
+     */
+    private static final String MIGRATION_MARKER_FILENAME = "ip-migration-v2.complete";
+
+    /**
      * Migrates existing plaintext IP addresses to encrypted format.
-     * This is a one-time operation that runs on startup after the encryption system is initialized.
-     * 
-     * The detection of plaintext vs encrypted addresses is based on attempting to decrypt each
-     * stored value. If decryption succeeds, the value is assumed to be already encrypted. If
-     * decryption throws an exception, the value is treated as plaintext and will be encrypted.
-     * 
-     * All migration operations are performed within a single database transaction to ensure atomicity.
+     *
+     * Detection of plaintext vs encrypted addresses works by attempting to decrypt each stored
+     * value. If decryption succeeds, the value is assumed to already be encrypted. If decryption
+     * throws, the value is treated as plaintext and will be encrypted.
+     *
+     * All migration operations run inside a single database transaction so the table is left
+     * either fully migrated or unchanged. On full success a marker file is written to the plugin
+     * data folder so subsequent startups skip the scan instead of decrypt-probing every row.
      */
     private void migrateExistingIpAddresses(DSLContext dsl, IpEncryption ipEncryption) {
+        File markerFile = new File(getDataFolder(), MIGRATION_MARKER_FILENAME);
+        if (markerFile.exists()) {
+            return;
+        }
+
         try {
             getLogger().info("Checking for plaintext IP addresses that need encryption...");
-            
+
             // Use a transaction to ensure atomicity of the migration
+            int[] failedCount = {0};
             dsl.transaction(configuration -> {
                 DSLContext txDsl = DSL.using(configuration);
-                
-                // Fetch all login records
-                var records = txDsl.selectFrom(com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD)
-                        .fetch();
-                
+
+                var records = txDsl.selectFrom(AAF_LOGIN_RECORD).fetch();
+
                 int totalRecords = records.size();
                 int alreadyEncrypted = 0;
                 int migrated = 0;
-                int failed = 0;
-                java.util.List<String> failedRecords = new java.util.ArrayList<>();
-                
+                List<String> failedRecords = new ArrayList<>();
+
                 getLogger().info("Processing " + totalRecords + " login records...");
-                
+
                 for (var record : records) {
                     String currentAddress = record.getAddress();
-                    
-                    // Skip records with no stored address
+
                     if (currentAddress == null || currentAddress.trim().isEmpty()) {
                         continue;
                     }
-                    
-                    // Check if this address is already encrypted
+
                     if (ipEncryption.isEncrypted(currentAddress)) {
                         alreadyEncrypted++;
                         continue;
                     }
-                    
-                    // This appears to be plaintext - encrypt it
+
                     try {
                         String encryptedIp = ipEncryption.encrypt(currentAddress);
-                        
-                        // Update the record with encrypted IP using the record's update method
+                        // jOOQ's UpdatableRecord.update() uses the *original* loaded primary-key
+                        // values for the WHERE clause, so changing ADDRESS (part of the PK) here
+                        // still targets the correct row.
                         record.setAddress(encryptedIp);
                         record.update();
-                        
                         migrated++;
                     } catch (Exception e) {
-                        failed++;
-                        String recordId = record.getMinecraftUuid() + ":" + currentAddress;
-                        failedRecords.add(recordId);
+                        failedRecords.add(record.getMinecraftUuid() + ":" + currentAddress);
                         getLogger().warning("Failed to encrypt IP for record " + record.getMinecraftUuid() + ": " + e.getMessage());
                     }
                 }
-                
-                // Log summary
+
+                failedCount[0] = failedRecords.size();
+
                 getLogger().info("IP address migration completed:");
                 getLogger().info("  Total records: " + totalRecords);
                 getLogger().info("  Already encrypted: " + alreadyEncrypted);
                 getLogger().info("  Newly encrypted: " + migrated);
-                getLogger().info("  Failed: " + failed);
-                
-                if (failed > 0) {
+                getLogger().info("  Failed: " + failedRecords.size());
+
+                if (!failedRecords.isEmpty()) {
                     getLogger().warning("The following records failed to encrypt:");
                     for (String failedRecord : failedRecords) {
                         getLogger().warning("  - " + failedRecord);
@@ -196,11 +210,29 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
                     getLogger().warning("These records may need manual intervention.");
                 }
             });
-            
+
+            if (failedCount[0] == 0) {
+                writeMigrationMarker(markerFile);
+            } else {
+                getLogger().warning("Migration completed with " + failedCount[0]
+                        + " failed record(s); the marker file will not be written so the migration "
+                        + "will retry on next startup.");
+            }
         } catch (Exception e) {
             getLogger().severe("Failed to migrate existing IP addresses: " + e.getMessage());
             getLogger().severe("The plugin will continue to run, but historical data may not be accessible.");
             // Don't fail startup - the plugin can still function with new data
+        }
+    }
+
+    private void writeMigrationMarker(File markerFile) {
+        try {
+            Files.createDirectories(markerFile.getParentFile().toPath());
+            Files.writeString(markerFile.toPath(),
+                    "IP encryption migration completed. Delete this file to force a re-scan on the next startup.\n");
+        } catch (IOException e) {
+            getLogger().warning("Could not write migration marker file " + markerFile.getAbsolutePath()
+                    + "; migration scan will run again next startup. Reason: " + e.getMessage());
         }
     }
 }

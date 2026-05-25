@@ -14,7 +14,9 @@ import org.jooq.Result;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -67,21 +69,21 @@ public final class LoginRepository {
                                         record.getFirstLogin(),
                                         record.getLastLogin()
                                 );
-                                return new java.util.AbstractMap.SimpleEntry<>(address, info);
+                                return new AbstractMap.SimpleEntry<>(address, info);
                             } catch (UnknownHostException exception) {
                                 throw new RuntimeException("Invalid IP address in database", exception);
                             } catch (RuntimeException exception) {
-                                // Log the specific record that failed but don't crash the entire operation
-                                // This allows partial data recovery if some records are corrupted
                                 throw new RuntimeException("Failed to decrypt IP for UUID " + minecraftUuid + ": " + exception.getMessage(), exception);
                             }
                         })
-                        .collect(
-                                Collectors.toMap(
-                                        java.util.Map.Entry::getKey,
-                                        java.util.Map.Entry::getValue
-                                )
-                        )
+                        // (minecraft_uuid, address) is the PK so duplicates shouldn't be possible,
+                        // but use a merge function rather than letting toMap throw if the invariant
+                        // is ever violated (e.g. corrupted data).
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (existing, replacement) -> existing
+                        ))
         );
     }
 
