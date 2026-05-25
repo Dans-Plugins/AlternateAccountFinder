@@ -15,18 +15,9 @@ All commands are sub-commands of `/aaf`.
 
 ---
 
-### /aaf ips \<player\>
-
-**Description:** Lists all IP addresses that the specified player has logged in from.  
-**Permission:** `aaf.ips`  
-**Usage:** `/aaf ips <player>`  
-**Example:** `/aaf ips Steve`
-
----
-
 ### /aaf alts \<player\>
 
-**Description:** Lists the suspected alternate accounts of the specified player (i.e. accounts that share at least one IP address with the player). Banned players are highlighted in red. Each result is clickable and runs `/aaf ips` for that account.  
+**Description:** Lists the suspected alternate accounts of the specified player (i.e. accounts that share at least one IP address with the player). Banned players are highlighted in red.  
 **Permission:** `aaf.alts`  
 **Usage:** `/aaf alts <player>`  
 **Example:** `/aaf alts Steve`

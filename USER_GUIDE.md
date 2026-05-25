@@ -35,20 +35,6 @@ Example:
 
 The plugin will list every player name that has connected from that IP.
 
-### Finding all IP addresses used by a player
-
-Use this to see every address a player has connected from:
-
-```
-/aaf ips <player>
-```
-
-Example:
-
-```
-/aaf ips Steve
-```
-
 ### Finding suspected alternate accounts for a player
 
 Use this to get a list of players who share at least one IP address with the target player:
@@ -63,12 +49,11 @@ Example:
 /aaf alts Steve
 ```
 
-Players who are banned are highlighted in red in the result list. Each result is clickable and runs `/aaf ips` for that account automatically.
+Players who are banned are highlighted in red in the result list.
 
 ## Permissions
 
 | Permission   | Default | Description                                      |
 |--------------|---------|--------------------------------------------------|
 | `aaf.accounts` | op    | Allows viewing all accounts for an IP address    |
-| `aaf.ips`      | op    | Allows viewing all IPs for a player              |
 | `aaf.alts`     | op    | Allows viewing suspected alt accounts for a player |
