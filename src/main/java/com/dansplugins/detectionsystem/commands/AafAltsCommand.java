@@ -1,16 +1,11 @@
 package com.dansplugins.detectionsystem.commands;
 
 import static net.md_5.bungee.api.ChatColor.*;
-import static net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND;
-import static net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT;
 
 import com.dansplugins.detectionsystem.AlternateAccountFinder;
 import com.dansplugins.detectionsystem.logins.LoginService;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -61,8 +56,6 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
                                 new ComponentBuilder("• ").color(GRAY).create(),
                                 new ComponentBuilder(alt.getName())
                                         .color(alt.isBanned() ? RED : YELLOW)
-                                        .event(new HoverEvent(SHOW_TEXT, new Text((alt.isBanned() ? "This player is banned. " : "") + "Click here to view other IPs for this account")))
-                                        .event(new ClickEvent(RUN_COMMAND, "/aaf ips " + alt.getName()))
                                         .create()
                         ).flatMap(Arrays::stream).toArray(BaseComponent[]::new)
                 );

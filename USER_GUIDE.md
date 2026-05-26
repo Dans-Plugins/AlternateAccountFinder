@@ -33,23 +33,7 @@ Example:
 /aaf accounts 192.168.1.1
 ```
 
-The plugin will list every player name that has connected from that IP, along with each account's login count and first/last login timestamps. Banned players are highlighted in red. Click any result to run `/aaf ips` for that account.
-
-### Finding all IP addresses used by a player
-
-Use this to see every address a player has connected from:
-
-```
-/aaf ips <player>
-```
-
-Example:
-
-```
-/aaf ips Steve
-```
-
-Each result shows the IP, login count, and first/last login timestamps. IPs that are banned via Bukkit's IP-ban list are highlighted in red. Click any result to run `/aaf accounts` for that IP.
+The plugin will list every player name that has connected from that IP, along with each account's login count and first/last login timestamps. Banned players are highlighted in red.
 
 ### Finding suspected alternate accounts for a player
 
@@ -65,12 +49,11 @@ Example:
 /aaf alts Steve
 ```
 
-Players who are banned are highlighted in red in the result list. Each result is clickable and runs `/aaf ips` for that account automatically.
+Players who are banned are highlighted in red in the result list.
 
 ## Permissions
 
 | Permission   | Default | Description                                      |
 |--------------|---------|--------------------------------------------------|
 | `aaf.accounts` | op    | Allows viewing all accounts for an IP address    |
-| `aaf.ips`      | op    | Allows viewing all IPs for a player              |
 | `aaf.alts`     | op    | Allows viewing suspected alt accounts for a player |

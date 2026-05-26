@@ -2,18 +2,13 @@ package com.dansplugins.detectionsystem.commands;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static net.md_5.bungee.api.ChatColor.*;
-import static net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND;
-import static net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT;
 
 import com.dansplugins.detectionsystem.AlternateAccountFinder;
 import com.dansplugins.detectionsystem.logins.AccountInfo;
 import com.dansplugins.detectionsystem.logins.AddressAccountInfo;
 import com.dansplugins.detectionsystem.logins.LoginService;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -74,8 +69,6 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
                                 new ComponentBuilder("• ").color(GRAY).create(),
                                 new ComponentBuilder(player.getName())
                                         .color(player.isBanned() ? RED : YELLOW)
-                                        .event(new HoverEvent(SHOW_TEXT, new Text((player.isBanned() ? "This player is banned. " : "") + "Click here to view other IPs for this account")))
-                                        .event(new ClickEvent(RUN_COMMAND, "/aaf ips " + player.getName()))
                                         .create(),
                                 new ComponentBuilder(" (" + accountInfo.getLogins() + " logins, first login "
                                         + ISO_LOCAL_DATE_TIME.format(accountInfo.getFirstLogin())
