@@ -8,7 +8,7 @@ All commands are sub-commands of `/aaf`.
 
 ### /aaf accounts \<ip\>
 
-**Description:** Lists all player accounts that have logged in from the specified IP address.  
+**Description:** Lists all player accounts that have logged in from the specified IP address, along with each account's login count and first/last login timestamps. Banned players are highlighted in red.  
 **Permission:** `aaf.accounts`  
 **Usage:** `/aaf accounts <ip>`  
 **Example:** `/aaf accounts 192.168.1.1`

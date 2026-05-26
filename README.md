@@ -105,7 +105,7 @@ You can view the bStats page for the plugin [here](https://bstats.org/plugin/buk
 
 - [Known Bugs](https://github.com/Dans-Plugins/AlternateAccountFinder/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 - [Planned Features](https://github.com/Dans-Plugins/AlternateAccountFinder/issues?q=is%3Aopen+is%3Aissue+label%3AEpic)
-- [Planned Improvements](https://github.com/Dans-Plugins/AlternateAccountFinder/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement)
+- [Planned Improvements](https://github.com/Dans-Plugins/AlternateAccountFinder/issues?q=is%3Aopen+is%3Aissue+label%3Aimprovement)
 
 ## Changelog
 

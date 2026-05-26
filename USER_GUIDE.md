@@ -33,7 +33,7 @@ Example:
 /aaf accounts 192.168.1.1
 ```
 
-The plugin will list every player name that has connected from that IP.
+The plugin will list every player name that has connected from that IP, along with each account's login count and first/last login timestamps. Banned players are highlighted in red.
 
 ### Finding suspected alternate accounts for a player
 
