@@ -1,0 +1,11 @@
+-- Migration for IP address encryption.
+--
+-- The schema change here widens the address column so Base64-encoded ciphertexts
+-- fit. The actual plaintext-to-ciphertext data conversion is performed by the
+-- application on startup (see AlternateAccountFinder#migrateExistingIpAddresses)
+-- because it requires the encryption key, which lives outside the database.
+--
+-- MODIFY COLUMN is the MySQL/MariaDB syntax and is also accepted by H2 when
+-- running in MYSQL mode (the default in this plugin's config.yml). NOT NULL is
+-- restated because MySQL/MariaDB drop the constraint otherwise.
+ALTER TABLE aaf_login_record MODIFY COLUMN address VARCHAR(255) NOT NULL;
