@@ -75,7 +75,13 @@ database:
 
 **Type:** list of UUIDs  
 **Default:** *(example UUIDs — replace with your own)*  
-**Description:** A list of player UUIDs that will receive in-game notifications when a player joins who has been detected as a potential alternate account. Remove all entries or leave the list empty to disable notifications.
+**Description:** A list of player UUIDs that will be notified when a player joins for the *first time* from a given IP and that IP already has at least one other associated account on record. Notifications are not re-sent for subsequent joins from the same IP. Remove all entries or leave the list empty to disable notifications.
+
+Notification delivery depends on which optional plugins are installed:
+
+- If the **Mailboxes** plugin is present, notifications are delivered as mailbox messages.
+- Otherwise, if the **RPKit** notification library is present, notifications go through the RPKit notification system.
+- If neither is installed, notifications fall back to a plain in-game chat message sent to the recipient if they are online.
 
 **Example:**
 

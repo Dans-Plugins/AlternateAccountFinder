@@ -33,7 +33,7 @@ Work items are tracked as [GitHub issues](https://github.com/Dans-Plugins/Altern
 
 ### Milestones
 
-Issues are grouped into [milestones](https://github.com/Dans-Plugins/AlternateAccountFinder/milestones) representing upcoming releases.
+Issues may be grouped into [milestones](https://github.com/Dans-Plugins/AlternateAccountFinder/milestones) when work is being planned for a specific release.
 
 ## Making Changes
 
@@ -47,9 +47,11 @@ Issues are grouped into [milestones](https://github.com/Dans-Plugins/AlternateAc
 8. Open a pull request against `main`, link the related issue with `#<number>`.
 9. Address review feedback.
 
-### Language Files
+### User-Facing Strings
 
-Update `src/main/resources/lang/` for any user-facing string changes.
+User-facing strings (command output, error messages, notification text) are
+currently hardcoded in the Java source under `src/main/java/`. There is no
+separate language-file layer yet — change the strings at their use site.
 
 ## Testing
 
