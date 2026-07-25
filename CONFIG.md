@@ -100,15 +100,15 @@ notify-users:
 
 | File | Created | Purpose |
 |------|---------|---------|
-| `ip-encryption.key` | First startup | The AES-256 key used to encrypt stored IP addresses. Restricted to owner read/write (`600`) on POSIX systems. **Must be backed up with your database** — see [IP Address Encryption](USER_GUIDE.md#ip-address-encryption). |
-| `ip-migration-v2.complete` | After the plaintext-to-encrypted migration finishes | A marker that records the one-time migration of pre-existing plaintext IP addresses. While it is present, startup skips the migration scan entirely. |
+| `ip-encryption.key` | First startup | The AES-256 key used to encrypt stored IP addresses. Set to owner read/write (`600`) on POSIX systems at the moment the plugin generates it. **Must be backed up with your database** — see [IP Address Encryption](USER_GUIDE.md#ip-address-encryption). |
+| `ip-migration-v2.complete` | First startup, once the plaintext-to-encrypted scan completes cleanly | A marker that records the one-time migration of pre-existing plaintext IP addresses. While it is present, startup skips the migration scan entirely. |
 
 ### ip-encryption.key
 
-Losing this file means every IP address already stored becomes permanently unreadable, and the plugin will generate a replacement key and continue running rather than stopping. The [User Guide](USER_GUIDE.md#back-up-the-key-file) describes exactly which lookups stop working. If the file is present but not exactly 32 bytes, the plugin treats it as corrupted and refuses to start — restore it from a backup rather than deleting it.
+Losing this file means every IP address already stored becomes permanently unreadable, and the plugin will generate a replacement key and carry on rather than stopping. The [User Guide](USER_GUIDE.md#back-up-the-key-file) describes exactly which lookups stop working. If the file is present but not exactly 32 bytes, the plugin treats it as corrupted and fails to enable — restore it from a backup rather than deleting it.
 
 ### ip-migration-v2.complete
 
-On the first startup after upgrading from a version that stored IP addresses as plaintext, the plugin scans every login record and encrypts any address that is still plaintext. It writes this marker once that pass completes with no failures, so later startups skip the scan instead of re-checking every record. If the pass had failures, the marker is not written and the migration is retried on the next startup.
+On startup, if this marker is absent, the plugin scans every login record and encrypts any address that is still plaintext. That is what upgrading from a version which stored IP addresses as plaintext needs; on a fresh install the scan simply finds nothing to do. Either way the marker is written once the pass completes with no failures, so later startups skip the scan instead of re-checking every record — which is why the file also appears on installs that never had any plaintext to migrate. If the pass had failures, the marker is not written and the migration is retried on the next startup.
 
 Deleting the marker forces the scan to run again on the next startup. Do not delete it as a routine measure, and in particular do not delete it if `ip-encryption.key` has been lost or replaced: the scan identifies plaintext by attempting to decrypt each stored value with the current key, so addresses encrypted under a key that is no longer present would be misread as plaintext and encrypted a second time.

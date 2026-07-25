@@ -17,7 +17,7 @@ To verify the plugin loaded correctly, run:
 
 You should see a usage message listing the available sub-commands.
 
-On that first startup the plugin also generates an encryption key and prints a warning block about backing it up. Read [IP Address Encryption](#ip-address-encryption) before you go any further — it is the one piece of setup that cannot be repaired after the fact.
+On that first startup the plugin also generates an encryption key and prints a warning block about backing it up. Read [IP Address Encryption](#ip-address-encryption) before you start collecting data you would not want to lose.
 
 ## IP Address Encryption
 
@@ -27,7 +27,9 @@ The plugin encrypts every IP address it stores, so the raw addresses are not rea
 plugins/AlternateAccountFinder/ip-encryption.key
 ```
 
-On Linux and other POSIX systems the plugin restricts this file to owner read/write (`600`) after creating it. On systems without POSIX file permissions (such as Windows) it logs that permission restrictions are unavailable and leaves the file as-is.
+On Linux and other POSIX systems the plugin restricts this file to owner read/write (`600`) at the moment it creates it. On systems without POSIX file permissions (such as Windows) it logs that permission restrictions are unavailable and leaves the file as-is. Permissions are only applied to a key the plugin generates itself — if you restore the file from a backup, check its permissions yourself.
+
+The other files the plugin keeps in that folder are described under [Files in the data folder](CONFIG.md#files-in-the-data-folder) in the Configuration Guide.
 
 ### Back up the key file
 
@@ -40,11 +42,7 @@ If the key file is missing when the server starts, the plugin does not stop — 
 
 There is no way to recover the old addresses without the original key file.
 
-If the key file exists but is not exactly 32 bytes, the plugin treats it as corrupted and refuses to start rather than quietly generating a replacement. Restore the file from a backup instead of deleting it.
-
-### Files in the data folder
-
-Besides `config.yml`, the plugin writes two files into `plugins/AlternateAccountFinder/` that are not configuration and should not be edited by hand. See the [Configuration Guide](CONFIG.md#files-in-the-data-folder) for details.
+If the key file exists but is not exactly 32 bytes, the plugin treats it as corrupted and fails to enable rather than quietly generating a replacement — the server keeps running without it. Restore the file from a backup instead of deleting it.
 
 ## Common Scenarios
 
