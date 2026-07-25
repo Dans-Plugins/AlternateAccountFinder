@@ -2,6 +2,8 @@
 
 All options are set in `plugins/AlternateAccountFinder/config.yml`. The file is created automatically on first run.
 
+The plugin also writes two non-configuration files into the same folder — see [Files in the data folder](#files-in-the-data-folder) at the end of this guide.
+
 ---
 
 ## database.url
@@ -89,3 +91,24 @@ Notification delivery depends on which optional plugins are installed:
 notify-users:
   - 0a9fa342-3139-49d7-8acb-fcf4d9c1f0ef
 ```
+
+---
+
+## Files in the data folder
+
+`plugins/AlternateAccountFinder/` holds two files besides `config.yml`. Neither is configuration, and neither should be edited by hand.
+
+| File | Created | Purpose |
+|------|---------|---------|
+| `ip-encryption.key` | First startup | The AES-256 key used to encrypt stored IP addresses. Set to owner read/write (`600`) on POSIX systems at the moment the plugin generates it. **Must be backed up with your database** — see [IP Address Encryption](USER_GUIDE.md#ip-address-encryption). |
+| `ip-migration-v2.complete` | First startup, once the plaintext-to-encrypted scan completes cleanly | A marker that records the one-time migration of pre-existing plaintext IP addresses. While it is present, startup skips the migration scan entirely. |
+
+### ip-encryption.key
+
+Losing this file means every IP address already stored becomes permanently unreadable, and the plugin will generate a replacement key and carry on rather than stopping. The [User Guide](USER_GUIDE.md#back-up-the-key-file) describes exactly which lookups stop working. If the file is present but not exactly 32 bytes, the plugin treats it as corrupted and fails to enable — restore it from a backup rather than deleting it.
+
+### ip-migration-v2.complete
+
+On startup, if this marker is absent, the plugin scans every login record and encrypts any address that is still plaintext. That is what upgrading from a version which stored IP addresses as plaintext needs; on a fresh install the scan simply finds nothing to do. Either way the marker is written once the pass completes with no failures, so later startups skip the scan instead of re-checking every record — which is why the file also appears on installs that never had any plaintext to migrate. If the pass had failures, the marker is not written and the migration is retried on the next startup.
+
+Deleting the marker forces the scan to run again on the next startup. Do not delete it as a routine measure, and in particular do not delete it if `ip-encryption.key` has been lost or replaced: the scan identifies plaintext by attempting to decrypt each stored value with the current key, so addresses encrypted under a key that is no longer present would be misread as plaintext and encrypted a second time.
