@@ -6,7 +6,6 @@ import static java.time.ZoneOffset.UTC;
 import com.dansplugins.detectionsystem.encryption.IpEncryption;
 import com.dansplugins.detectionsystem.jooq.tables.AafLoginRecord;
 import com.dansplugins.detectionsystem.jooq.tables.records.AafLoginRecordRecord;
-import org.bukkit.entity.Player;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -115,11 +114,7 @@ public final class LoginRepository {
         return count != null ? count : 0;
     }
 
-    public void saveLogin(Player player) {
-        saveLogin(player.getUniqueId(), player.getAddress().getAddress());
-    }
-
-    private void saveLogin(UUID minecraftUuid, InetAddress address) {
+    public void saveLogin(UUID minecraftUuid, InetAddress address) {
         String encryptedAddress = ipEncryption.encrypt(address.getHostAddress());
         dsl.insertInto(AAF_LOGIN_RECORD)
                 .set(AAF_LOGIN_RECORD.MINECRAFT_UUID, minecraftUuid.toString())
