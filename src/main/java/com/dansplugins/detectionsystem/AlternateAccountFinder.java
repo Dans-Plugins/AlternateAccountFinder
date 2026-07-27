@@ -5,6 +5,7 @@ import static java.util.logging.Level.SEVERE;
 
 import com.dansplugins.detectionsystem.commands.AafCommand;
 import com.dansplugins.detectionsystem.encryption.IpEncryption;
+import com.dansplugins.detectionsystem.encryption.StoredAddressClassifier;
 import com.dansplugins.detectionsystem.listeners.PlayerJoinListener;
 import com.dansplugins.detectionsystem.logins.LoginRepository;
 import com.dansplugins.detectionsystem.logins.LoginService;
@@ -137,9 +138,11 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     /**
      * Migrates existing plaintext IP addresses to encrypted format.
      *
-     * Detection of plaintext vs encrypted addresses works by attempting to decrypt each stored
-     * value. If decryption succeeds, the value is assumed to already be encrypted. If decryption
-     * throws, the value is treated as plaintext and will be encrypted.
+     * Each stored value is classified by {@link StoredAddressClassifier}: a value that decrypts
+     * with the current key is already encrypted, and a value that does not decrypt is only
+     * encrypted if it also parses as an IP literal. A value that is neither — most commonly
+     * ciphertext written under a key that is no longer present — is left untouched and reported,
+     * because encrypting it would double-encrypt the row.
      *
      * All migration operations run inside a single database transaction so the table is left
      * either fully migrated or unchanged. On full success a marker file is written to the plugin
@@ -155,7 +158,8 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
             getLogger().info("Checking for plaintext IP addresses that need encryption...");
 
             // Use a transaction to ensure atomicity of the migration
-            int[] failedCount = {0};
+            int[] unmigratedCount = {0};
+            StoredAddressClassifier classifier = new StoredAddressClassifier(ipEncryption);
             dsl.transaction(configuration -> {
                 DSLContext txDsl = DSL.using(configuration);
 
@@ -164,19 +168,28 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
                 int totalRecords = records.size();
                 int alreadyEncrypted = 0;
                 int migrated = 0;
+                // Only UUIDs are collected here: the addresses themselves must never reach the log.
                 List<String> failedRecords = new ArrayList<>();
+                List<String> unrecognizedRecords = new ArrayList<>();
 
                 getLogger().info("Processing " + totalRecords + " login records...");
 
                 for (var record : records) {
                     String currentAddress = record.getAddress();
 
-                    if (currentAddress == null || currentAddress.trim().isEmpty()) {
+                    StoredAddressClassifier.Classification classification = classifier.classify(currentAddress);
+
+                    if (classification == StoredAddressClassifier.Classification.BLANK) {
                         continue;
                     }
 
-                    if (ipEncryption.isEncrypted(currentAddress)) {
+                    if (classification == StoredAddressClassifier.Classification.ENCRYPTED) {
                         alreadyEncrypted++;
+                        continue;
+                    }
+
+                    if (classification == StoredAddressClassifier.Classification.UNRECOGNIZED) {
+                        unrecognizedRecords.add(String.valueOf(record.getMinecraftUuid()));
                         continue;
                     }
 
@@ -189,39 +202,58 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
                         record.update();
                         migrated++;
                     } catch (Exception e) {
-                        failedRecords.add(record.getMinecraftUuid() + ":" + currentAddress);
+                        failedRecords.add(String.valueOf(record.getMinecraftUuid()));
                         getLogger().warning("Failed to encrypt IP for record " + record.getMinecraftUuid() + ": " + e.getMessage());
                     }
                 }
 
-                failedCount[0] = failedRecords.size();
+                unmigratedCount[0] = failedRecords.size() + unrecognizedRecords.size();
 
                 getLogger().info("IP address migration completed:");
                 getLogger().info("  Total records: " + totalRecords);
                 getLogger().info("  Already encrypted: " + alreadyEncrypted);
                 getLogger().info("  Newly encrypted: " + migrated);
+                getLogger().info("  Unrecognized (left unchanged): " + unrecognizedRecords.size());
                 getLogger().info("  Failed: " + failedRecords.size());
 
+                if (!unrecognizedRecords.isEmpty()) {
+                    getLogger().warning(unrecognizedRecords.size() + " stored address(es) could not be read with the "
+                            + "current encryption key and are not plaintext IP addresses either.");
+                    getLogger().warning("This usually means the IP encryption key file is missing or has been "
+                            + "replaced, so data encrypted with the previous key can no longer be decrypted.");
+                    getLogger().warning("These records were left unchanged - encrypting them again would corrupt them "
+                            + "beyond recovery. Restore the original key file from backup and restart.");
+                    logAffectedRecords(unrecognizedRecords);
+                }
+
                 if (!failedRecords.isEmpty()) {
-                    getLogger().warning("The following records failed to encrypt:");
-                    for (String failedRecord : failedRecords) {
-                        getLogger().warning("  - " + failedRecord);
-                    }
-                    getLogger().warning("These records may need manual intervention.");
+                    getLogger().warning("The following records failed to encrypt and may need manual intervention:");
+                    logAffectedRecords(failedRecords);
                 }
             });
 
-            if (failedCount[0] == 0) {
+            if (unmigratedCount[0] == 0) {
                 writeMigrationMarker(markerFile);
             } else {
-                getLogger().warning("Migration completed with " + failedCount[0]
-                        + " failed record(s); the marker file will not be written so the migration "
+                getLogger().warning("Migration completed with " + unmigratedCount[0]
+                        + " unmigrated record(s); the marker file will not be written so the migration "
                         + "will retry on next startup.");
             }
         } catch (Exception e) {
             getLogger().severe("Failed to migrate existing IP addresses: " + e.getMessage());
             getLogger().severe("The plugin will continue to run, but historical data may not be accessible.");
             // Don't fail startup - the plugin can still function with new data
+        }
+    }
+
+    /**
+     * Logs the accounts owning records the migration could not handle. Only the UUID is logged -
+     * the stored address is never written to the log, since on the unmigrated paths it is either a
+     * player's plaintext IP or unreadable ciphertext.
+     */
+    private void logAffectedRecords(List<String> minecraftUuids) {
+        for (String minecraftUuid : minecraftUuids) {
+            getLogger().warning("  - " + minecraftUuid);
         }
     }
 
