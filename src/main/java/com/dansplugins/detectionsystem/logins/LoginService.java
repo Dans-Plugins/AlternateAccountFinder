@@ -1,7 +1,5 @@
 package com.dansplugins.detectionsystem.logins;
 
-import org.bukkit.entity.Player;
-
 import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +28,7 @@ public final class LoginService {
         return repo.getLoginCount(minecraftUuid, ip);
     }
 
-    public void saveLogin(Player player) {
-        repo.saveLogin(player);
+    public void saveLogin(UUID minecraftUuid, InetAddress address) {
+        repo.saveLogin(minecraftUuid, address);
     }
 }

@@ -83,18 +83,8 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("aaf.accounts")) {
-            return List.of();
-        }
-        if (args.length == 0) {
-            return plugin.getServer().getOnlinePlayers().stream().map(player -> player.getAddress().getAddress().getHostAddress()).toList();
-        } else if (args.length == 1) {
-            return plugin.getServer().getOnlinePlayers().stream()
-                    .map(player -> player.getAddress().getAddress().getHostAddress())
-                    .filter(ip -> ip.startsWith(args[0]))
-                    .toList();
-        } else {
-            return List.of();
-        }
+        // No suggestions for the <ip> argument: enumerating online players' IPs here would
+        // reintroduce the disclosure #44 removed /aaf ips for (see issue #64).
+        return List.of();
     }
 }
