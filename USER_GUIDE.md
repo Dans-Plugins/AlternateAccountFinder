@@ -60,7 +60,7 @@ Example:
 /aaf accounts 192.168.1.1
 ```
 
-The plugin will list every player name that has connected from that IP, along with each account's login count and first/last login timestamps. Banned players are highlighted in red.
+The plugin will list every player name that has connected from that IP, along with each account's login count and first/last login timestamps. Banned players are highlighted in red. An account the server has no cached name for — for example one that has not connected since the server's player cache was cleared — is listed by its UUID instead.
 
 ### Finding suspected alternate accounts for a player
 
@@ -76,7 +76,7 @@ Example:
 /aaf alts Steve
 ```
 
-Players who are banned are highlighted in red in the result list.
+Players who are banned are highlighted in red in the result list. As with `/aaf accounts`, an account the server has no cached name for is listed by its UUID.
 
 ## Permissions
 
