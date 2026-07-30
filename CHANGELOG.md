@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - The "You do not have permission to use this command." message from `/aaf accounts` and `/aaf alts` is now red, like every other error message those commands send (see [#75](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/75)).
+- `/aaf alts` tab-completion now suggests only online players instead of every account the server has cached data for. On a long-lived server that offline list can number in the tens of thousands, and Bukkit builds an `OfflinePlayer` for each one on every keystroke; a moderator checking an offline account can still type its full name (see [#76](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/76)).
 
 ### Fixed
 

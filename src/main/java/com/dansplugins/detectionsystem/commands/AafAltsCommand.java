@@ -11,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
@@ -73,10 +74,12 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
         if (args.length > 1) {
             return List.of();
         }
-        // Names are collected before filtering because an account the server has no cached name
-        // for yields null here; PlayerNames skips those instead of throwing (see issue #74).
-        List<String> names = Arrays.stream(plugin.getServer().getOfflinePlayers())
-                .map(OfflinePlayer::getName)
+        // Suggests only online players rather than every OfflinePlayer the server has cached data
+        // for: on a long-lived server that list can be tens of thousands of entries, and
+        // Server#getOfflinePlayers() walks all of them on the main thread on every keystroke (see
+        // issue #76). A moderator checking an offline account can still type its full name.
+        List<String> names = plugin.getServer().getOnlinePlayers().stream()
+                .map(Player::getName)
                 .toList();
         return PlayerNames.matchingNames(names, args.length == 0 ? "" : args[0]);
     }
