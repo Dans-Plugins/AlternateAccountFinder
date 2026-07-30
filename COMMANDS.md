@@ -8,7 +8,7 @@ All commands are sub-commands of `/aaf`.
 
 ### /aaf accounts \<ip\>
 
-**Description:** Lists all player accounts that have logged in from the specified IP address, along with each account's login count and first/last login timestamps. Banned players are highlighted in red.  
+**Description:** Lists all player accounts that have logged in from the specified IP address, along with each account's login count and first/last login timestamps. Banned players are highlighted in red, and accounts the server has no cached name for are listed by UUID.  
 **Permission:** `aaf.accounts`  
 **Usage:** `/aaf accounts <ip>`  
 **Example:** `/aaf accounts 192.168.1.1`
@@ -17,7 +17,7 @@ All commands are sub-commands of `/aaf`.
 
 ### /aaf alts \<player\>
 
-**Description:** Lists the suspected alternate accounts of the specified player (i.e. accounts that share at least one IP address with the player). Banned players are highlighted in red.  
+**Description:** Lists the suspected alternate accounts of the specified player (i.e. accounts that share at least one IP address with the player). Banned players are highlighted in red, and accounts the server has no cached name for are listed by UUID.  
 **Permission:** `aaf.alts`  
 **Usage:** `/aaf alts <player>`  
 **Example:** `/aaf alts Steve`

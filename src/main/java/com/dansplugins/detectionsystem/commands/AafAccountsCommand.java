@@ -33,7 +33,7 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("aaf.accounts")) {
-            sender.sendMessage("You do not have permission to use this command.");
+            sender.sendMessage(RED + "You do not have permission to use this command.");
             return true;
         }
 
@@ -67,7 +67,7 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
                 sender.spigot().sendMessage(
                         Stream.of(
                                 new ComponentBuilder("• ").color(GRAY).create(),
-                                new ComponentBuilder(player.getName())
+                                new ComponentBuilder(PlayerNames.displayName(player.getName(), uuid))
                                         .color(player.isBanned() ? RED : YELLOW)
                                         .create(),
                                 new ComponentBuilder(" (" + accountInfo.getLogins() + " logins, first login "

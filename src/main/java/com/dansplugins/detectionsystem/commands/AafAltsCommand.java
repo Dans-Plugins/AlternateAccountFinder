@@ -28,7 +28,7 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("aaf.alts")) {
-            sender.sendMessage("You do not have permission to use this command.");
+            sender.sendMessage(RED + "You do not have permission to use this command.");
             return true;
         }
 
@@ -42,19 +42,20 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             LoginService loginService = plugin.getLoginService();
             List<UUID> potentialAlts = loginService.getPotentialAlts(player.getUniqueId());
+            String playerName = PlayerNames.displayName(player.getName(), player.getUniqueId());
 
             if (potentialAlts.isEmpty()) {
-                sender.sendMessage(RED + "No potential alts found for " + player.getName());
+                sender.sendMessage(RED + "No potential alts found for " + playerName);
                 return;
             }
 
-            sender.sendMessage(WHITE + "Potential alts for " + player.getName() + ":");
+            sender.sendMessage(WHITE + "Potential alts for " + playerName + ":");
             potentialAlts.forEach(uuid -> {
                 OfflinePlayer alt = plugin.getServer().getOfflinePlayer(uuid);
                 sender.spigot().sendMessage(
                         Stream.of(
                                 new ComponentBuilder("• ").color(GRAY).create(),
-                                new ComponentBuilder(alt.getName())
+                                new ComponentBuilder(PlayerNames.displayName(alt.getName(), uuid))
                                         .color(alt.isBanned() ? RED : YELLOW)
                                         .create()
                         ).flatMap(Arrays::stream).toArray(BaseComponent[]::new)
@@ -69,14 +70,14 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
         if (!sender.hasPermission("aaf.alts")) {
             return List.of();
         }
-        if (args.length == 0) {
-            return Arrays.stream(plugin.getServer().getOfflinePlayers()).map(OfflinePlayer::getName).toList();
-        } else if (args.length == 1) {
-            return Arrays.stream(plugin.getServer().getOfflinePlayers()).map(OfflinePlayer::getName)
-                    .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
-                    .toList();
-        } else {
+        if (args.length > 1) {
             return List.of();
         }
+        // Names are collected before filtering because an account the server has no cached name
+        // for yields null here; PlayerNames skips those instead of throwing (see issue #74).
+        List<String> names = Arrays.stream(plugin.getServer().getOfflinePlayers())
+                .map(OfflinePlayer::getName)
+                .toList();
+        return PlayerNames.matchingNames(names, args.length == 0 ? "" : args[0]);
     }
 }
