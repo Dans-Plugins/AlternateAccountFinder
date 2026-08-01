@@ -86,6 +86,12 @@ public final class LoginRepository {
         );
     }
 
+    /**
+     * Returns each other account that has logged in from at least one of this account's addresses.
+     * The join produces one row per shared address, so the select must be distinct — otherwise an
+     * account sharing several addresses is listed once per address in command output and join
+     * notifications.
+     */
     public List<UUID> getPotentialAlts(UUID minecraftUuid) {
         AafLoginRecord record1 = AAF_LOGIN_RECORD.as("record1");
         AafLoginRecord record2 = AAF_LOGIN_RECORD.as("record2");

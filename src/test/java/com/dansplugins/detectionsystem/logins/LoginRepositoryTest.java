@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -137,6 +138,49 @@ class LoginRepositoryTest {
         List<UUID> alts = repository.getPotentialAlts(owner);
 
         assertEquals(List.of(alt), alts);
+    }
+
+    @Test
+    void potentialAltSharingSeveralAddressesIsListedOnce() throws UnknownHostException {
+        // The query joins the login records against themselves, producing one row per shared
+        // address; without a distinct select the same account came back once per address and
+        // was printed repeatedly in /aaf alts and in join notifications.
+        UUID owner = UUID.randomUUID();
+        UUID alt = UUID.randomUUID();
+        InetAddress first = address("192.168.5.1");
+        InetAddress second = address("192.168.5.2");
+        InetAddress third = address("192.168.5.3");
+
+        repository.saveLogin(owner, first);
+        repository.saveLogin(owner, second);
+        repository.saveLogin(owner, third);
+        repository.saveLogin(alt, first);
+        repository.saveLogin(alt, second);
+        repository.saveLogin(alt, third);
+
+        assertEquals(List.of(alt), repository.getPotentialAlts(owner));
+    }
+
+    @Test
+    void everyPotentialAltSharingSeveralAddressesIsListedOnce() throws UnknownHostException {
+        UUID owner = UUID.randomUUID();
+        UUID firstAlt = UUID.randomUUID();
+        UUID secondAlt = UUID.randomUUID();
+        InetAddress first = address("192.168.6.1");
+        InetAddress second = address("192.168.6.2");
+
+        repository.saveLogin(owner, first);
+        repository.saveLogin(owner, second);
+        repository.saveLogin(firstAlt, first);
+        repository.saveLogin(firstAlt, second);
+        repository.saveLogin(secondAlt, first);
+        repository.saveLogin(secondAlt, second);
+
+        // Distinct must collapse the duplicate rows without dropping a genuinely different
+        // account, so both alts are expected exactly once. Sorted because the query does not
+        // guarantee an order.
+        List<UUID> alts = repository.getPotentialAlts(owner).stream().sorted().toList();
+        assertEquals(Stream.of(firstAlt, secondAlt).sorted().toList(), alts);
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.dansplugins.detectionsystem.listeners;
 import static org.bukkit.event.EventPriority.MONITOR;
 
 import com.dansplugins.detectionsystem.AlternateAccountFinder;
+import com.dansplugins.detectionsystem.commands.PlayerNames;
 import com.dansplugins.detectionsystem.logins.LoginService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,15 +42,20 @@ public final class PlayerJoinListener implements Listener {
             if (loginService.getLoginCount(minecraftUuid, address) == 1) {
                 List<UUID> potentialAlts = loginService.getPotentialAlts(minecraftUuid);
                 if (potentialAlts.size() > 0) {
-                    plugin.getLogger().info("Found potential alts for " + playerName + ": " + String.join(", ", potentialAlts.stream().map(uuid -> com.dansplugins.detectionsystem.commands.PlayerNames.displayName(plugin.getServer().getOfflinePlayer(uuid).getName(), uuid)).toList()));
+                    // An account the server has no cached name for is reported as null by Bukkit,
+                    // which previously printed the literal string "null" here; fall back to the
+                    // account's UUID instead, as the /aaf commands do (see issue #74).
+                    String altNames = String.join(", ", potentialAlts.stream()
+                            .map(uuid -> PlayerNames.displayName(plugin.getServer().getOfflinePlayer(uuid).getName(), uuid))
+                            .toList());
+                    plugin.getLogger().info("Found potential alts for " + playerName + ": " + altNames);
                     plugin.getServer().getScheduler().runTask(plugin, () -> {
                         List<UUID> recipients = parseValidUuids(plugin.getConfig().getStringList("notify-users"), plugin.getLogger());
                         recipients.forEach(recipient -> {
                             plugin.getNotificationService().sendNotification(
                                     recipient,
                                     playerName + " - potential alts",
-                                    playerName + " is potentially an alt of: " +
-                                            String.join(", ", potentialAlts.stream().map(uuid -> com.dansplugins.detectionsystem.commands.PlayerNames.displayName(plugin.getServer().getOfflinePlayer(uuid).getName(), uuid)).toList())
+                                    playerName + " is potentially an alt of: " + altNames
                             );
                         });
                     });
