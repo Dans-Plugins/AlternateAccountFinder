@@ -41,7 +41,7 @@ public final class PlayerJoinListener implements Listener {
             if (loginService.getLoginCount(minecraftUuid, address) == 1) {
                 List<UUID> potentialAlts = loginService.getPotentialAlts(minecraftUuid);
                 if (potentialAlts.size() > 0) {
-                    plugin.getLogger().info("Found potential alts for " + playerName + ": " + String.join(", ", potentialAlts.stream().map(uuid -> plugin.getServer().getOfflinePlayer(uuid).getName()).toList()));
+                    plugin.getLogger().info("Found potential alts for " + playerName + ": " + String.join(", ", potentialAlts.stream().map(uuid -> com.dansplugins.detectionsystem.commands.PlayerNames.displayName(plugin.getServer().getOfflinePlayer(uuid).getName(), uuid)).toList()));
                     plugin.getServer().getScheduler().runTask(plugin, () -> {
                         List<UUID> recipients = parseValidUuids(plugin.getConfig().getStringList("notify-users"), plugin.getLogger());
                         recipients.forEach(recipient -> {
@@ -49,7 +49,7 @@ public final class PlayerJoinListener implements Listener {
                                     recipient,
                                     playerName + " - potential alts",
                                     playerName + " is potentially an alt of: " +
-                                            String.join(", ", potentialAlts.stream().map(uuid -> plugin.getServer().getOfflinePlayer(uuid).getName()).toList())
+                                            String.join(", ", potentialAlts.stream().map(uuid -> com.dansplugins.detectionsystem.commands.PlayerNames.displayName(plugin.getServer().getOfflinePlayer(uuid).getName(), uuid)).toList())
                             );
                         });
                     });
