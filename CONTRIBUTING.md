@@ -60,10 +60,11 @@ Run a verification build with:
 Linux: `./gradlew clean build`  
 Windows: `.\gradlew.bat clean build`
 
-For manual testing, start a local Spigot server:
+For manual testing, build and run a local Spigot server with the plugin installed:
 
 ```
-docker compose up
+docker build -t aaf-test-server .
+docker run -p 25565:25565 aaf-test-server
 ```
 
 ## Questions
