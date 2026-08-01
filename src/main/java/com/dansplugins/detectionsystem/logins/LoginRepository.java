@@ -96,7 +96,7 @@ public final class LoginRepository {
         AafLoginRecord record1 = AAF_LOGIN_RECORD.as("record1");
         AafLoginRecord record2 = AAF_LOGIN_RECORD.as("record2");
         Result<Record1<String>> result = dsl
-                .selectDistinct(record2.MINECRAFT_UUID)
+                .select(record2.MINECRAFT_UUID)
                 .from(
                     record1,
                     record2
