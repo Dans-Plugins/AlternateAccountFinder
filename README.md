@@ -59,18 +59,16 @@ If you see `BUILD SUCCESSFUL`, the build has passed.
 
 ### Test Server
 
-A Docker-based test server is available for development.
+A `Dockerfile` is available to build and run a Spigot test server with the plugin installed.
 
 #### Setup
 
-1. Build the plugin: `./gradlew build`
-2. Start the test server: `docker compose up`
+1. Build the test server image: `docker build -t aaf-test-server .`
+2. Run the test server: `docker run -p 25565:25565 aaf-test-server`
 
 #### Stopping the Test Server
 
-```
-docker compose down
-```
+Press `Ctrl+C`, or run `docker stop <container-id>` if it's running in the background.
 
 ## Authors and Acknowledgements
 
