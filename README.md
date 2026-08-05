@@ -55,20 +55,42 @@ Windows:
 
 If you see `BUILD SUCCESSFUL`, the build has passed.
 
+### Unit Tests
+
+The project has a JUnit 5 test suite under `src/test/java/`. The verification build above runs it, and it can also be run on its own:
+
+Linux:
+
+```
+./gradlew test
+```
+
+Windows:
+
+```
+.\gradlew.bat test
+```
+
 ## Development
 
 ### Test Server
 
-A `Dockerfile` is available to build and run a Spigot test server with the plugin installed.
+A `Dockerfile` and a `compose.yml` are available to build and run a Spigot test server with the plugin installed.
 
-#### Setup
+#### Setup with Docker Compose
+
+1. Build and start the test server: `docker compose up`
+
+The compose file builds the image from the `Dockerfile` in this repository and publishes port 25565.
+
+#### Setup with Docker
 
 1. Build the test server image: `docker build -t aaf-test-server .`
 2. Run the test server: `docker run -p 25565:25565 aaf-test-server`
 
 #### Stopping the Test Server
 
-Press `Ctrl+C`, or run `docker stop <container-id>` if it's running in the background.
+Press `Ctrl+C`. If the server was started in the background, run `docker compose down` when Docker Compose was used, or `docker stop <container-id>` otherwise.
 
 ## Authors and Acknowledgements
 
