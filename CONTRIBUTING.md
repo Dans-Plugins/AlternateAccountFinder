@@ -69,7 +69,7 @@ The verification build runs them; to run only the tests:
 Linux: `./gradlew test`  
 Windows: `.\gradlew.bat test`
 
-Cover new behaviour with a test where the class can be exercised without a running server. Classes
+Cover new behavior with a test where the class can be exercised without a running server. Classes
 that depend on the Bukkit API (command executors, event listeners) are generally tested through the
 service, repository, or helper class holding their logic.
 
