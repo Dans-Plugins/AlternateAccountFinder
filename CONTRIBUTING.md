@@ -60,7 +60,29 @@ Run a verification build with:
 Linux: `./gradlew clean build`  
 Windows: `.\gradlew.bat clean build`
 
-For manual testing, build and run a local Spigot server with the plugin installed:
+### Unit Tests
+
+Automated tests use JUnit 5 and live under `src/test/java/`, mirroring the package of the class
+under test (for example `src/test/java/com/dansplugins/detectionsystem/encryption/IpEncryptionTest.java`).
+The verification build runs them; to run only the tests:
+
+Linux: `./gradlew test`  
+Windows: `.\gradlew.bat test`
+
+Cover new behaviour with a test where the class can be exercised without a running server. Classes
+that depend on the Bukkit API (command executors, event listeners) are generally tested through the
+service, repository, or helper class holding their logic.
+
+### Manual Testing
+
+For manual testing, build and run a local Spigot server with the plugin installed, either with
+Docker Compose:
+
+```
+docker compose up
+```
+
+or with Docker directly:
 
 ```
 docker build -t aaf-test-server .
