@@ -38,7 +38,7 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            sender.sendMessage(RED + "Usage: /aaf accounts [ip]");
+            sender.sendMessage(RED + "Usage: /aaf accounts <ip>");
             return true;
         }
 

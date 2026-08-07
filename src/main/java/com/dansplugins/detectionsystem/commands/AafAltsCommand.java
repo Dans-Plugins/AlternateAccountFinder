@@ -34,7 +34,7 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            sender.sendMessage(RED + "Usage: /aaf alts [player]");
+            sender.sendMessage(RED + "Usage: /aaf alts <player>");
             return true;
         }
 
