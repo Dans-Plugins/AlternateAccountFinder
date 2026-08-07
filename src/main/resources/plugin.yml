@@ -10,8 +10,8 @@ commands:
   aaf:
     description: |
       Alternate Account Finder commands
-      /aaf accounts [ip] - Lists all accounts that have logged in from the specified IP
-      /aaf alts [player] - Lists the suspected alts of a specified player
+      /aaf accounts <ip> - Lists all accounts that have logged in from the specified IP
+      /aaf alts <player> - Lists the suspected alts of a specified player
 
 permissions:
   aaf.accounts:
