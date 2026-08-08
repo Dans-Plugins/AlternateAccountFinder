@@ -73,6 +73,12 @@ Cover new behavior with a test where the class can be exercised without a runnin
 that depend on the Bukkit API (command executors, event listeners) are generally tested through the
 service, repository, or helper class holding their logic.
 
+No mock framework is configured; prefer real or in-memory collaborators (H2 in memory for
+database-backed tests, `@TempDir` for filesystem state). Where a Bukkit interface has to be stood in
+for, a `java.lang.reflect.Proxy` over that interface keeps the test dependency-free — see
+`AafCommandTest` for the pattern. Branches that reach the server itself stay uncovered by design and
+are noted as such in the test.
+
 ### Manual Testing
 
 For manual testing, build and run a local Spigot server with the plugin installed, either with
