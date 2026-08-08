@@ -141,6 +141,10 @@ class AafCommandTest {
     void suggestsNothingForTheIpArgumentOfAccounts() {
         // Enumerating IPs here would reintroduce the disclosure /aaf ips was removed for
         // (issues #44 and #64), so the accounts completer must stay empty.
+        //
+        // This asserts the outcome, not the route: the accounts completer and the
+        // unknown-subcommand fall-through both return an empty list, so nothing observable
+        // distinguishes them from here. The routing itself is pinned by the onCommand tests.
         RecordingSender sender = new RecordingSender(true);
 
         assertEquals(List.of(),
