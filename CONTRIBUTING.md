@@ -30,6 +30,9 @@ Thank you for your interest in contributing to Alternate Account Finder! This gu
 ### Issues
 
 Work items are tracked as [GitHub issues](https://github.com/Dans-Plugins/AlternateAccountFinder/issues).
+New issues are opened from a [template](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/new/choose):
+**Bug Report** for something the plugin does wrong, **Feature Request** for a new capability or an
+improvement to an existing one.
 
 ### Milestones
 
@@ -39,13 +42,64 @@ Issues may be grouped into [milestones](https://github.com/Dans-Plugins/Alternat
 
 1. Make sure an issue exists for the work. If not, create one.
 2. Switch to `main`: `git checkout main`
-3. Create a branch: `git checkout -b <branch-name>`
+3. Create a branch: `git checkout -b <prefix>/<short-description>`
 4. Make your changes.
 5. Test your changes.
-6. Commit: `git commit -m "Description of changes"`
+6. Commit: `git commit -m "Describe the change"`
 7. Push: `git push origin <branch-name>`
-8. Open a pull request against `main`, link the related issue with `#<number>`.
+8. Open a pull request against `main`, and write `Closes #<number>` in the description so the
+   issue closes when the pull request is merged.
 9. Address review feedback.
+
+### Branch Names
+
+Branch from `main` using one of the prefixes already in use in this repository, followed by a
+short hyphenated description:
+
+| Prefix | For | Example |
+|--------|-----|---------|
+| `feature/` | New capabilities and additional test coverage | `feature/login-service-tests` |
+| `fix/` | Bug fixes | `fix/nullable-account-names` |
+| `docs/` | Documentation-only changes | `docs/fix-docker-test-server-instructions` |
+| `chore/` | Releases, build and tooling changes | `chore/release-3.0.0` |
+
+### Commit Messages
+
+Write the subject in the imperative mood — "Add the missing permission node", not "Added" or
+"Adds" — with no trailing period. A Conventional Commits type prefix (`fix:`, `chore:`) is
+accepted but not required; both forms appear in the history.
+
+If an AI assistant produced the change, credit it with a `Co-Authored-By:` trailer naming the
+model that actually ran — not a model name copied from an earlier commit. Git matches the
+trailer key case-insensitively, so the `Co-authored-by:` spelling also present in the history
+is equivalent. A HEREDOC keeps the trailer on its own line:
+
+```bash
+git commit -m "$(cat <<'EOF'
+Describe the change in the imperative mood
+
+Co-Authored-By: <model name> <noreply@anthropic.com>
+EOF
+)"
+```
+
+### Linking Issues
+
+Use `Closes #<number>` in the pull request description for every issue the pull request
+resolves. A bare `#<number>` links the issue but leaves it open.
+
+### Merging
+
+Squash merging is the default, which is why most commit subjects on `main` end in
+`(#<number>)`. A handful of merge commits sit alongside them where a pull request was merged
+without squashing; prefer the squash so each pull request lands as one commit.
+
+### Changelog
+
+Any change a server operator would notice — command behavior, configuration, messages,
+stored data — gets an entry in [CHANGELOG.md](CHANGELOG.md) under an `[Unreleased]` heading,
+classified per [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Add that heading
+above the most recent release when the last one has already been cut.
 
 ### User-Facing Strings
 
