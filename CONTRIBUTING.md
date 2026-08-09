@@ -97,8 +97,9 @@ without squashing; prefer the squash so each pull request lands as one commit.
 ### Changelog
 
 Any change a server operator would notice — command behavior, configuration, messages,
-stored data — gets an entry under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md), classified
-per [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+stored data — gets an entry in [CHANGELOG.md](CHANGELOG.md) under an `[Unreleased]` heading,
+classified per [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Add that heading
+above the most recent release when the last one has already been cut.
 
 ### User-Facing Strings
 
