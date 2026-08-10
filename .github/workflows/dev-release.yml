@@ -1,0 +1,87 @@
+name: Dev Release
+
+# Publishes a rolling prerelease of the main branch so that server operators can opt into
+# unreleased changes via Dan's Plugin Manager (`/dpm get alternateaccountfinder --experimental`).
+#
+# The build steps deliberately mirror release.yml — if the release build changes, change it here too.
+
+on:
+  push:
+    branches: [ main ]
+    # A documentation-only merge produces an identical JAR, so it is not worth a new prerelease
+    # (and the release notification it sends to every watcher of this repository).
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# The publish step deletes and recreates the release, so two runs must never overlap.
+# Queue instead of cancelling: a cancelled run could leave the repository with no dev release at all.
+concurrency:
+  group: dev-release
+  cancel-in-progress: false
+
+jobs:
+  dev-release:
+    runs-on: ubuntu-latest
+    # Forks have neither the release to publish to nor a reason to publish one.
+    if: github.repository == 'Dans-Plugins/AlternateAccountFinder'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Republish the dev prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          # Dan's Plugin Manager installs the first .jar asset it finds on the release, so publishing
+          # more than one would leave the installed build depending on asset order. An empty or
+          # ambiguous match fails the run rather than publishing something unpredictable.
+          jars=(build/libs/*-all.jar)
+          if [ ${#jars[@]} -ne 1 ]; then
+            echo "Expected exactly one JAR to publish, found ${#jars[@]}: ${jars[*]:-none}" >&2
+            exit 1
+          fi
+
+          # The dev tag has to move to the new commit. Editing a published release does not move its
+          # tag, so the release and its tag are deleted and recreated. This leaves a window of a few
+          # seconds with no dev release; a client that fetches during it sees "no experimental build
+          # published" and succeeds on the next attempt.
+          gh release delete dev --yes --cleanup-tag || true
+
+          gh release create dev \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Development build" \
+            --notes "Automated build of \`main\` at ${GITHUB_SHA}.
+
+          **This is not a release.** It is unreleased, unreviewed code that has not been through any
+          release check, and a broken build can stop a server from starting. Do not run it on a server
+          you care about without a backup.
+
+          Install it with Dan's Plugin Manager:
+
+          \`\`\`
+          /dpm get alternateaccountfinder --experimental
+          \`\`\`
+
+          Return to published releases with \`/dpm get alternateaccountfinder --stable\`." \
+            "${jars[0]}"
