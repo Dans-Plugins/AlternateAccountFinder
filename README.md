@@ -37,6 +37,7 @@ Already-reported bugs are listed [here](https://github.com/Dans-Plugins/Alternat
 ## Contributing
 
 - [CONTRIBUTING.md](CONTRIBUTING.md)
+- [CLAUDE.md](CLAUDE.md) – Repository guide for AI coding agents
 - [Notes for Developers](https://github.com/Dans-Plugins/AlternateAccountFinder/wiki/Developer-Notes)
 
 ## Testing
