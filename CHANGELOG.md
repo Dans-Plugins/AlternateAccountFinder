@@ -13,17 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [3.0.0-SNAPSHOT-8-8-2026] – 2026-08-08
 
 ### Changed
+
 - AlternateAccountFinder is now developed AI-first. Day-to-day feature work, grooming, review and maintenance run through AI agents working directly against this repository, with the maintainers setting direction and approving what lands. The major version bump marks that change in how the project is built — it is not a break in behaviour, configuration or stored data, and existing installations can upgrade in place. Released as `3.0.0-SNAPSHOT-8-8-2026`: the AI-first line has not yet been verified in live operation, and the dated snapshot designation stays until it has.
-
-### Security
-
-- IP addresses are now encrypted at rest using deterministic AES-256 (ECB mode) instead of being stored as plaintext, so lookups (accounts-by-IP, alt detection) still work while the raw address is no longer readable directly from the database (see [#45](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/45)). The encryption key is generated on first startup and stored in the plugin's data folder with `0600` permissions.
-- Existing plaintext IP addresses from installs predating this change are automatically migrated to the encrypted format on plugin startup, with a completion marker so the migration only runs once (see [#46](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/46)).
-- The startup IP migration no longer writes IP addresses to the server log. When a record could not be encrypted, the log line included the raw address alongside the player's UUID; it now names the account only (see [#70](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/70)).
-- `/aaf accounts` tab-completion no longer suggests the IP addresses of online players. Pressing Tab after `/aaf accounts` now returns no suggestions, since enumerating raw IPs there reintroduced the disclosure `/aaf ips` was removed for (see [#64](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/64)).
-
-### Changed
-
 - The "You do not have permission to use this command." message from `/aaf accounts` and `/aaf alts` is now red, like every other error message those commands send (see [#75](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/75)).
 - The usage messages of `/aaf accounts` and `/aaf alts`, and the command descriptions shown by `plugin.yml`, now write their required argument as `<ip>` and `<player>` rather than `[ip]` and `[player]`. Square brackets conventionally mark an argument as optional, while both arguments are mandatory; the angle-bracket form already used by `COMMANDS.md` is now used everywhere (see [#83](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/83)).
 - `/aaf alts` tab-completion now suggests only online players instead of every account the server has cached data for. On a long-lived server that offline list can number in the tens of thousands, and Bukkit builds an `OfflinePlayer` for each one on every keystroke; a moderator checking an offline account can still type its full name (see [#76](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/76)).
@@ -40,6 +31,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Removed
 
 - Removed the `/aaf ips` sub-command and its `aaf.ips` permission. Exposing the list of IP addresses a player has used was a privacy concern (see [#44](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/44)). Click/hover actions on `/aaf accounts` and `/aaf alts` results no longer invoke `/aaf ips`.
+
+### Security
+
+- IP addresses are now encrypted at rest using deterministic AES-256 (ECB mode) instead of being stored as plaintext, so lookups (accounts-by-IP, alt detection) still work while the raw address is no longer readable directly from the database (see [#45](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/45)). The encryption key is generated on first startup and stored in the plugin's data folder with `0600` permissions.
+- Existing plaintext IP addresses from installs predating this change are automatically migrated to the encrypted format on plugin startup, with a completion marker so the migration only runs once (see [#46](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/46)).
+- The startup IP migration no longer writes IP addresses to the server log. When a record could not be encrypted, the log line included the raw address alongside the player's UUID; it now names the account only (see [#70](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/70)).
+- `/aaf accounts` tab-completion no longer suggests the IP addresses of online players. Pressing Tab after `/aaf accounts` now returns no suggestions, since enumerating raw IPs there reintroduced the disclosure `/aaf ips` was removed for (see [#64](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/64)).
 
 ## [2.0.0]
 
