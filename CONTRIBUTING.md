@@ -101,6 +101,21 @@ stored data — gets an entry in [CHANGELOG.md](CHANGELOG.md) under an `[Unrelea
 classified per [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Add that heading
 above the most recent release when the last one has already been cut.
 
+Within a release, the section headings go in the Keep a Changelog order, and each one appears
+at most once:
+
+1. `### Added`
+2. `### Changed`
+3. `### Deprecated`
+4. `### Removed`
+5. `### Fixed`
+6. `### Security`
+
+Omit the headings a release has no entries for rather than leaving them empty. If a release
+already has the heading an entry belongs under, add the entry to it instead of opening a second
+one — a duplicate heading is how [#92](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/92)
+came about.
+
 ### User-Facing Strings
 
 User-facing strings (command output, error messages, notification text) are

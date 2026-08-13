@@ -145,7 +145,10 @@ to agent-authored changes.
 - Squash merging is the default, which is why most subjects on `main` end in `(#<number>)`
 - Stage files by name; `git add -A` sweeps in agent scratch state the project `.gitignore` does
   not cover
-- Add a `CHANGELOG.md` entry under `[Unreleased]` for any change a server operator would notice
+- Add a `CHANGELOG.md` entry under `[Unreleased]` for any change a server operator would notice,
+  under one of the Keep a Changelog headings in that order — `Added`, `Changed`, `Deprecated`,
+  `Removed`, `Fixed`, `Security` — using the heading already present rather than opening a second
+  one; `CONTRIBUTING.md` states the rule in full
 
 ## Documentation Sources of Truth
 
