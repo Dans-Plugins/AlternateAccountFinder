@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - A `Dev Release` workflow, which republishes a rolling `dev` prerelease of `main` on every non-documentation push. This is what Dan's Plugin Manager's experimental channel installs from: `/dpm get alternateaccountfinder --experimental` reads `releases/tags/dev`, so without it there is nothing for that command to download. The prerelease is unreleased, unreviewed code and is marked as such.
 
+### Fixed
+
+- The database connection pool is now closed when the plugin is disabled. It previously stayed open for the lifetime of the server process, so every `/reload` — and every disable performed by a plugin manager such as Dan's Plugin Manager — left the old pool's connections and threads running while the next startup built a second pool beside them (see [#97](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/97)).
+
 ## [3.0.0-SNAPSHOT-8-8-2026] – 2026-08-08
 
 ### Changed

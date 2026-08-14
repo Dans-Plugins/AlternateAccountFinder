@@ -2,6 +2,7 @@ package com.dansplugins.detectionsystem;
 
 import static com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD;
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 import com.dansplugins.detectionsystem.commands.AafCommand;
 import com.dansplugins.detectionsystem.encryption.IpEncryption;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public final class AlternateAccountFinder extends JavaPlugin implements Listener {
 
@@ -117,6 +119,38 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         // Metrics
         int pluginId = 9834;
         new Metrics(this, pluginId);
+    }
+
+    @Override
+    public void onDisable() {
+        // Bukkit keeps the JVM alive across a plugin disable, so a pool that is not closed here
+        // survives every /reload and every plugin-manager disable with its connections and
+        // housekeeping threads intact, while the next onEnable builds a second one alongside it.
+        closeDataSource(dataSource, getLogger());
+        dataSource = null;
+    }
+
+    /**
+     * Closes the connection pool behind {@code dataSource}, if there is one and it is closeable.
+     *
+     * <p>{@link DataSource} itself declares no close operation; HikariCP's implementation is what
+     * adds one, and releasing its connections and threads is the whole point of this call. A pool
+     * that was never built — an {@code onEnable} that threw before the assignment — and an
+     * implementation that is simply not closeable are both no-ops rather than failures.
+     *
+     * <p>A failure to close is logged rather than rethrown: an exception escaping
+     * {@code onDisable} is reported by Bukkit as a plugin fault, and nothing useful can be done
+     * about a stuck pool at that point anyway.
+     */
+    static void closeDataSource(DataSource dataSource, Logger logger) {
+        if (!(dataSource instanceof AutoCloseable closeable)) {
+            return;
+        }
+        try {
+            closeable.close();
+        } catch (Exception exception) {
+            logger.log(WARNING, "Failed to close the database connection pool", exception);
+        }
     }
 
     public LoginService getLoginService() {
