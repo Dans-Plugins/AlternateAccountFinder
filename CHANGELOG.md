@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The usage messages of `/aaf accounts` and `/aaf alts`, and the command descriptions shown by `plugin.yml`, now write their required argument as `<ip>` and `<player>` rather than `[ip]` and `[player]`. Square brackets conventionally mark an argument as optional, while both arguments are mandatory; the angle-bracket form already used by `COMMANDS.md` is now used everywhere (see [#83](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/83)).
 - `/aaf alts` tab-completion now suggests only online players instead of every account the server has cached data for. On a long-lived server that offline list can number in the tens of thousands, and Bukkit builds an `OfflinePlayer` for each one on every keystroke; a moderator checking an offline account can still type its full name (see [#76](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/76)).
 
+### Removed
+
+- Removed the `/aaf ips` sub-command and its `aaf.ips` permission. Exposing the list of IP addresses a player has used was a privacy concern (see [#44](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/44)). Click/hover actions on `/aaf accounts` and `/aaf alts` results no longer invoke `/aaf ips`.
+
 ### Fixed
 
 - An account that shares more than one IP address with the joining player is no longer listed once per shared address. `/aaf alts`, the join notification, and the "Found potential alts" log line each named such an account repeatedly; the potential-alt lookup is now distinct (see [#80](https://github.com/Dans-Plugins/AlternateAccountFinder/pull/80)).
@@ -27,10 +31,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The startup IP migration no longer re-encrypts addresses it cannot read. Previously any value that failed to decrypt was assumed to be plaintext, so if the encryption key file was lost or replaced while the migration marker was absent, existing ciphertext was encrypted a second time and reported as a successful migration. A value is now only encrypted when it also parses as an IPv4 or IPv6 address; anything else is left untouched, reported in the startup log with the likely cause, and counted as unmigrated so the marker is not written (see [#67](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/67)).
 - Fixed a possible `NullPointerException` (and a silently dropped login record) when a player disconnects immediately after joining, before the async login-recording task runs. The player's address is now resolved on the main thread while it is still available (see [#65](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/65)).
 - A malformed entry in the `notify-users` config list no longer throws an unhandled exception that silently drops every recipient listed after it. Invalid entries are now skipped with a warning naming the offending value, and the remaining recipients are still notified (see [#66](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/66)).
-
-### Removed
-
-- Removed the `/aaf ips` sub-command and its `aaf.ips` permission. Exposing the list of IP addresses a player has used was a privacy concern (see [#44](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/44)). Click/hover actions on `/aaf accounts` and `/aaf alts` results no longer invoke `/aaf ips`.
 
 ### Security
 
