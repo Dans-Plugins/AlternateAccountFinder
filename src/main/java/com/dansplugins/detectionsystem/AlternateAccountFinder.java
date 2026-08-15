@@ -172,10 +172,14 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
      * accepted: an operator pointing the plugin at MySQL through the MariaDB driver depends on
      * that, and only the two dialects this plugin ships drivers for are named in the message.
      *
-     * @throws IllegalArgumentException if the value is missing, blank, or not a dialect jOOQ knows.
+     * @throws IllegalArgumentException if the value is blank or is not a dialect jOOQ knows.
      *                                  {@code SQLDialect.valueOf} throws for the same cases, but
      *                                  with a message that mentions neither {@code config.yml} nor
-     *                                  the offending key.
+     *                                  the offending key. A {@code null} value is treated as blank;
+     *                                  a key an operator has deleted resolves to the bundled
+     *                                  {@code config.yml} default rather than to {@code null}, so
+     *                                  that branch only guards against the bundled default itself
+     *                                  going missing.
      */
     static SQLDialect parseDialect(String configuredDialect) {
         if (configuredDialect == null || configuredDialect.isBlank()) {
