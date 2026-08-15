@@ -6,16 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Fixed
-
-- The `Dev Release` workflow now retries publishing the `dev` prerelease before giving up. The release and its tag have to be deleted and recreated for the tag to move to the new commit, and a transient API failure inside that window previously left the repository with no `dev` release at all until the workflow was re-run by hand. Each attempt now starts from a clean slate, and an exhausted retry fails loudly.
-
 ### Added
 
 - A `Dev Release` workflow, which republishes a rolling `dev` prerelease of `main` on every non-documentation push. This is what Dan's Plugin Manager's experimental channel installs from: `/dpm get alternateaccountfinder --experimental` reads `releases/tags/dev`, so without it there is nothing for that command to download. The prerelease is unreleased, unreviewed code and is marked as such.
 
 ### Fixed
 
+- A misspelled or empty `database.dialect` in `config.yml` is now reported as a startup message naming the key, quoting the offending value and giving the two dialects the plugin ships drivers for, after which the plugin disables itself. Previously the value went straight to jOOQ, which answered with `No enum constant org.jooq.SQLDialect.mariadb` — a message that names neither `config.yml` nor an acceptable value — and did so only after the connection pool had already been opened. The value is also matched case-insensitively now, so `h2` and `mariadb` are accepted alongside `H2` and `MARIADB` (see [#101](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/101)).
+- The `Dev Release` workflow now retries publishing the `dev` prerelease before giving up. The release and its tag have to be deleted and recreated for the tag to move to the new commit, and a transient API failure inside that window previously left the repository with no `dev` release at all until the workflow was re-run by hand. Each attempt now starts from a clean slate, and an exhausted retry fails loudly.
 - The database connection pool is now closed when the plugin is disabled. It previously stayed open for the lifetime of the server process, so every `/reload` — and every disable performed by a plugin manager such as Dan's Plugin Manager — left the old pool's connections and threads running while the next startup built a second pool beside them (see [#97](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/97)).
 
 ## [3.0.0-SNAPSHOT-8-8-2026] – 2026-08-08

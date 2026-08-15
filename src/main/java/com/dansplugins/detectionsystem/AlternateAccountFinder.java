@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 public final class AlternateAccountFinder extends JavaPlugin implements Listener {
@@ -42,6 +43,17 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     @Override
     public void onEnable() {
         saveDefaultConfig();
+
+        // Configuration is validated before anything is opened, so a rejected dialect leaves no
+        // connection pool behind.
+        SQLDialect dialect;
+        try {
+            dialect = parseDialect(getConfig().getString("database.dialect"));
+        } catch (IllegalArgumentException exception) {
+            getLogger().severe(exception.getMessage());
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         // Ensure database drivers are loaded
         try {
@@ -82,7 +94,6 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         // jOOQ
         System.setProperty("org.jooq.no-logo", "true");
         System.setProperty("org.jooq.no-tips", "true");
-        SQLDialect dialect = SQLDialect.valueOf(getConfig().getString("database.dialect"));
         Settings jooqSettings = new Settings().withRenderSchema(false);
         DSLContext dsl = DSL.using(
                 dataSource,
@@ -150,6 +161,37 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
             closeable.close();
         } catch (Exception exception) {
             logger.log(WARNING, "Failed to close the database connection pool", exception);
+        }
+    }
+
+    /**
+     * Resolves the {@code database.dialect} config value to the jOOQ dialect it names.
+     *
+     * <p>The value is matched case-insensitively, so {@code h2} and {@code mariadb} name the same
+     * dialects as {@code H2} and {@code MARIADB}. Any other dialect jOOQ recognises is still
+     * accepted: an operator pointing the plugin at MySQL through the MariaDB driver depends on
+     * that, and only the two dialects this plugin ships drivers for are named in the message.
+     *
+     * @throws IllegalArgumentException if the value is blank or is not a dialect jOOQ knows.
+     *                                  {@code SQLDialect.valueOf} throws for the same cases, but
+     *                                  with a message that mentions neither {@code config.yml} nor
+     *                                  the offending key. A {@code null} value is treated as blank;
+     *                                  a key an operator has deleted resolves to the bundled
+     *                                  {@code config.yml} default rather than to {@code null}, so
+     *                                  that branch only guards against the bundled default itself
+     *                                  going missing.
+     */
+    static SQLDialect parseDialect(String configuredDialect) {
+        if (configuredDialect == null || configuredDialect.isBlank()) {
+            throw new IllegalArgumentException("database.dialect is not set in config.yml. "
+                    + "Set it to H2 for the embedded database, or MARIADB for MariaDB/MySQL.");
+        }
+        try {
+            return SQLDialect.valueOf(configuredDialect.strip().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException("database.dialect in config.yml is set to \""
+                    + configuredDialect + "\", which is not a dialect this plugin can use. "
+                    + "Set it to H2 for the embedded database, or MARIADB for MariaDB/MySQL.", exception);
         }
     }
 
