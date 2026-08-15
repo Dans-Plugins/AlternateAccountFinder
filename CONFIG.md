@@ -32,7 +32,7 @@ database:
 
 **Type:** string  
 **Default:** `H2`  
-**Description:** The SQL dialect that jOOQ uses when generating queries. Set to `H2` for the embedded database or `MARIADB` for MariaDB/MySQL.
+**Description:** The SQL dialect that jOOQ uses when generating queries. Set to `H2` for the embedded database or `MARIADB` for MariaDB/MySQL. Case does not matter, so `h2` and `mariadb` work too. If the key is missing, blank, or set to something that is not a dialect the plugin can use, startup stops with a message naming the key and the accepted values, and the plugin disables itself rather than running against the wrong dialect.
 
 **Example:**
 
