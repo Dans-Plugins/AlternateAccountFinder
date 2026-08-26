@@ -38,9 +38,11 @@ public final class AafAltsCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        OfflinePlayer player = plugin.getServer().getOfflinePlayer(args[0]);
-
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            // Resolving a name to an account may involve a blocking web request whenever the name
+            // is not in the server's user cache, so it happens here rather than on the main thread
+            // (see issue #103). Nothing before this point needs the resolved account.
+            OfflinePlayer player = plugin.getServer().getOfflinePlayer(args[0]);
             LoginService loginService = plugin.getLoginService();
             List<UUID> potentialAlts = loginService.getPotentialAlts(player.getUniqueId());
             String playerName = PlayerNames.displayName(player.getName(), player.getUniqueId());
