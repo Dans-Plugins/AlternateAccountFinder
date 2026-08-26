@@ -2,18 +2,21 @@ package com.dansplugins.detectionsystem.logins;
 
 import static com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD;
 import static java.time.ZoneOffset.UTC;
+import static org.jooq.impl.DSL.max;
 
 import com.dansplugins.detectionsystem.encryption.IpEncryption;
 import com.dansplugins.detectionsystem.jooq.tables.AafLoginRecord;
 import com.dansplugins.detectionsystem.jooq.tables.records.AafLoginRecordRecord;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
+import org.jooq.Field;
+import org.jooq.Record2;
 import org.jooq.Result;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,10 +32,23 @@ public final class LoginRepository {
         this.ipEncryption = ipEncryption;
     }
 
+    /**
+     * Returns every account that has logged in from {@code ip}, most recently seen first.
+     *
+     * <p>The order is what a moderator reads the list in, so it is defined here rather than left to
+     * the database: rows come back ordered by last login descending, with the account UUID breaking
+     * ties so two accounts last seen at the same moment do not swap places between runs. The
+     * collector has to preserve that order too — {@code Collectors.toMap} defaults to a
+     * {@link java.util.HashMap}, which would put the list back into hash order (see issue #104).
+     *
+     * <p>The address is matched as ciphertext, which works because {@link IpEncryption} is
+     * deterministic.
+     */
     public AddressAccountInfo getAddressInfo(InetAddress ip) {
         String encryptedAddress = ipEncryption.encrypt(ip.getHostAddress());
         Result<AafLoginRecordRecord> result = dsl.selectFrom(AAF_LOGIN_RECORD)
                 .where(AAF_LOGIN_RECORD.ADDRESS.eq(encryptedAddress))
+                .orderBy(AAF_LOGIN_RECORD.LAST_LOGIN.desc(), AAF_LOGIN_RECORD.MINECRAFT_UUID.asc())
                 .fetch();
 
         return new AddressAccountInfo(
@@ -45,7 +61,12 @@ public final class LoginRepository {
                                                 record.getLogins(),
                                                 record.getFirstLogin(),
                                                 record.getLastLogin()
-                                        )
+                                        ),
+                                        // (address, minecraft_uuid) is the PK, so one account
+                                        // cannot appear twice for one address; keep the first row
+                                        // rather than letting toMap throw if that is ever violated.
+                                        (existing, replacement) -> existing,
+                                        LinkedHashMap::new
                                 )
                         )
         );
@@ -87,16 +108,26 @@ public final class LoginRepository {
     }
 
     /**
-     * Returns each other account that has logged in from at least one of this account's addresses.
-     * The join produces one row per shared address, so the select must be distinct — otherwise an
-     * account sharing several addresses is listed once per address in command output and join
-     * notifications.
+     * Returns each other account that has logged in from at least one of this account's addresses,
+     * most recently seen first.
+     *
+     * <p>The join produces one row per shared address, so an account sharing several addresses
+     * would otherwise be listed once per address in command output and join notifications. Grouping
+     * by the candidate account collapses those rows to one, as the earlier {@code SELECT DISTINCT}
+     * did, and additionally yields the timestamp the ordering needs: {@code SELECT DISTINCT} cannot
+     * be ordered by a column outside its select list, so the grouped form is what expresses
+     * "newest first" here (see issues #80 and #104).
+     *
+     * <p>The timestamp ordered on is the newest login among the rows that matched — that is, the
+     * last time the candidate was seen on an address it shares with {@code minecraftUuid}, rather
+     * than the last time it was seen at all. The account UUID breaks ties.
      */
     public List<UUID> getPotentialAlts(UUID minecraftUuid) {
         AafLoginRecord record1 = AAF_LOGIN_RECORD.as("record1");
         AafLoginRecord record2 = AAF_LOGIN_RECORD.as("record2");
-        Result<Record1<String>> result = dsl
-                .selectDistinct(record2.MINECRAFT_UUID)
+        Field<LocalDateTime> lastSharedLogin = max(record2.LAST_LOGIN);
+        Result<Record2<String, LocalDateTime>> result = dsl
+                .select(record2.MINECRAFT_UUID, lastSharedLogin)
                 .from(
                     record1,
                     record2
@@ -104,6 +135,8 @@ public final class LoginRepository {
                 .where(record1.MINECRAFT_UUID.eq(minecraftUuid.toString()))
                 .and(record1.MINECRAFT_UUID.ne(record2.MINECRAFT_UUID))
                 .and(record1.ADDRESS.eq(record2.ADDRESS))
+                .groupBy(record2.MINECRAFT_UUID)
+                .orderBy(lastSharedLogin.desc(), record2.MINECRAFT_UUID.asc())
                 .fetch();
 
         return result.stream()
