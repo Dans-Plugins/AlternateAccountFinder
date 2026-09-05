@@ -78,6 +78,29 @@ Example:
 
 The account seen most recently on an address it shares with the target player is listed first. Players who are banned are highlighted in red in the result list. As with `/aaf accounts`, an account the server has no cached name for is listed by its UUID.
 
+### Being told about a suspected alt without running a command
+
+Both commands above have to be typed by somebody who already suspects something. The plugin can also announce a suspected alt by itself, at the moment the account joins.
+
+The announcement fires when both of these hold:
+
+- the joining account has never been seen from that IP address before, and
+- that IP address already has at least one other account on record.
+
+Only that account's first join from that address triggers it. An account that keeps connecting from the same address is not re-announced, so a busy shared address does not produce a message on every join.
+
+When it fires, two things happen. The server log gains a line naming the joining player and the accounts it shares an address with:
+
+```
+[AlternateAccountFinder] Found potential alts for Steve: Alex, Notch
+```
+
+And each account listed under `notify-users` in `config.yml` is sent a notification titled `Steve - potential alts` reading `Steve is potentially an alt of: Alex, Notch`. Accounts are listed most recently seen first, as they are by `/aaf alts`, and an account the server has no cached name for is named by its UUID. No IP address appears in either the log line or the notification.
+
+To choose who is told, put their account UUIDs under `notify-users` — see [notify-users](CONFIG.md#notify-users) in the Configuration Guide for the key itself. **The shipped `config.yml` carries two example UUIDs, which are not yours; replace them with your own staff's before relying on the notification.** An entry that is not a valid UUID is skipped with a warning naming the entry, and the remaining entries are still notified. An empty list disables the notification, and the log line is still written.
+
+If a notification never arrives, the delivery backend is the usual reason. One is chosen at startup: the **Mailboxes** plugin if it is installed, otherwise the **RPKit** notification library, otherwise a plain in-game chat message. Only the first of those reaches a recipient who is offline at the time — with the plain chat fallback, a notification aimed at an offline account is dropped, and with RPKit it needs RPKit to hold a profile for that account, which is reported in the server log as a warning naming the account when it does not.
+
 ## Permissions
 
 | Permission   | Default | Description                                      |
