@@ -87,7 +87,7 @@ The announcement fires when both of these hold:
 - the joining account has never been seen from that IP address before, and
 - that IP address already has at least one other account on record.
 
-Only the first join from a given address triggers it. An account that keeps connecting from the same address is not re-announced, so a busy shared address does not produce a message on every join.
+Only that account's first join from that address triggers it. An account that keeps connecting from the same address is not re-announced, so a busy shared address does not produce a message on every join.
 
 When it fires, two things happen. The server log gains a line naming the joining player and the accounts it shares an address with:
 
