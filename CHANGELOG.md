@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- A "Being told about a suspected alt without running a command" scenario in the [User Guide](USER_GUIDE.md), covering the join-time alt notification: what triggers it, that it fires only on the first login from a given address, what the log line and the notification say, how recipients are chosen through `notify-users`, that the shipped entries are examples to be replaced, and why a notification may never arrive. The behaviour itself is unchanged; it was previously documented nowhere an operator would look for it (see [#107](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/107)).
 - A `Dev Release` workflow, which republishes a rolling `dev` prerelease of `main` on every non-documentation push. This is what Dan's Plugin Manager's experimental channel installs from: `/dpm get alternateaccountfinder --experimental` reads `releases/tags/dev`, so without it there is nothing for that command to download. The prerelease is unreleased, unreviewed code and is marked as such.
 
 ### Fixed
