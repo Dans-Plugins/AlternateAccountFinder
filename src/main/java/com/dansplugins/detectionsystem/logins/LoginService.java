@@ -16,10 +16,6 @@ public final class LoginService {
         return repo.getAddressInfo(ip);
     }
 
-    public AccountAddressInfo getAccountInfo(UUID minecraftUuid) {
-        return repo.getAccountInfo(minecraftUuid);
-    }
-
     public List<UUID> getPotentialAlts(UUID minecraftUuid) {
         return repo.getPotentialAlts(minecraftUuid);
     }
