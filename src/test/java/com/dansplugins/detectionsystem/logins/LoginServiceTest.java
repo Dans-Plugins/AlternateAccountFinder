@@ -94,17 +94,6 @@ class LoginServiceTest {
     }
 
     @Test
-    void getAccountInfoReturnsAddressesUsedByPlayer() throws UnknownHostException {
-        UUID player = UUID.randomUUID();
-        InetAddress ip = address("172.20.0.1");
-
-        service.saveLogin(player, ip);
-
-        AccountAddressInfo info = service.getAccountInfo(player);
-        assertEquals(List.of(ip), info.getAddresses());
-    }
-
-    @Test
     void getPotentialAltsReturnsAccountsSharingAnAddress() throws UnknownHostException {
         UUID owner = UUID.randomUUID();
         UUID alt = UUID.randomUUID();

@@ -30,7 +30,7 @@ All source lives under `src/main/java/com/dansplugins/detectionsystem/`:
 | `commands/` | `AafCommand` (dispatch and tab completion), `AafAccountsCommand`, `AafAltsCommand`, `PlayerNames` |
 | `encryption/` | `IpEncryption` (deterministic AES over stored addresses), `StoredAddressClassifier` |
 | `listeners/` | `PlayerJoinListener` |
-| `logins/` | `LoginRepository`, `LoginService`, and the `AccountInfo` / `AddressInfo` / `AccountAddressInfo` / `AddressAccountInfo` value types |
+| `logins/` | `LoginRepository`, `LoginService`, and the `AccountInfo` / `AddressAccountInfo` value types |
 | `notifications/` | `NotificationService` and its `Mailboxes`, `Rpk` and `Message` implementations |
 
 Resources live under `src/main/resources/`: `plugin.yml`, `config.yml`, and Flyway migrations
@@ -45,7 +45,10 @@ mode. `/aaf ips` was removed for that reason (#44), address-suggesting tab compl
 after it reintroduced the same disclosure (#64), and the startup migration was changed to log only
 UUIDs (#70). No new code path may surface an address — or a list of addresses — to command output,
 the server log, tab-completion suggestions, or hover/click text. When a record has to be named in
-output or a log line, name the account, not the address.
+output or a log line, name the account, not the address. Nothing under `src/main` decrypts a stored
+address: the account-to-addresses lookup that backed `/aaf ips` was removed with it (#110), so a
+new command cannot obtain plaintext addresses from `LoginService` without first adding a decrypt
+path — which is the change to refuse.
 
 ### Layering
 

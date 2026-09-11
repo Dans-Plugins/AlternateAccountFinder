@@ -13,12 +13,9 @@ import org.jooq.Record2;
 import org.jooq.Result;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -69,41 +66,6 @@ public final class LoginRepository {
                                         LinkedHashMap::new
                                 )
                         )
-        );
-    }
-
-    public AccountAddressInfo getAccountInfo(UUID minecraftUuid) {
-        Result<AafLoginRecordRecord> result = dsl.selectFrom(AAF_LOGIN_RECORD)
-                .where(AAF_LOGIN_RECORD.MINECRAFT_UUID.eq(minecraftUuid.toString()))
-                .fetch();
-
-        return new AccountAddressInfo(
-                minecraftUuid,
-                result.stream()
-                        .map(record -> {
-                            try {
-                                String decryptedAddress = ipEncryption.decrypt(record.getAddress());
-                                InetAddress address = InetAddress.getByName(decryptedAddress);
-                                AddressInfo info = new AddressInfo(
-                                        record.getLogins(),
-                                        record.getFirstLogin(),
-                                        record.getLastLogin()
-                                );
-                                return new AbstractMap.SimpleEntry<>(address, info);
-                            } catch (UnknownHostException exception) {
-                                throw new RuntimeException("Invalid IP address in database", exception);
-                            } catch (RuntimeException exception) {
-                                throw new RuntimeException("Failed to decrypt IP for UUID " + minecraftUuid + ": " + exception.getMessage(), exception);
-                            }
-                        })
-                        // (minecraft_uuid, address) is the PK so duplicates shouldn't be possible,
-                        // but use a merge function rather than letting toMap throw if the invariant
-                        // is ever violated (e.g. corrupted data).
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue,
-                                (existing, replacement) -> existing
-                        ))
         );
     }
 

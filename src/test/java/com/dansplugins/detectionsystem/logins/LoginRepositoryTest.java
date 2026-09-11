@@ -132,18 +132,6 @@ class LoginRepositoryTest {
     }
 
     @Test
-    void accountInfoDecryptsAddressesBackToOriginalIp() throws UnknownHostException {
-        UUID player = UUID.randomUUID();
-        InetAddress ip = address("172.16.0.1");
-        repository.saveLogin(player, ip);
-
-        AccountAddressInfo info = repository.getAccountInfo(player);
-
-        assertEquals(List.of(ip), info.getAddresses());
-        assertEquals(1, info.getAddressInfo(ip).getLogins());
-    }
-
-    @Test
     void potentialAltsAreAccountsSharingAnAddress() throws UnknownHostException {
         UUID owner = UUID.randomUUID();
         UUID alt = UUID.randomUUID();
@@ -286,6 +274,8 @@ class LoginRepositoryTest {
     void storedAddressesAreEncryptedRatherThanPlaintext() throws UnknownHostException {
         // Regression guard for the encryption invariant this repository depends on:
         // lookups must go through IpEncryption rather than storing/matching plaintext.
+        // The stored column is read back directly, since nothing in the repository
+        // decrypts an address any more (see issue #110).
         UUID player = UUID.randomUUID();
         InetAddress ip = address("198.51.100.7");
 
@@ -295,7 +285,13 @@ class LoginRepositoryTest {
         assertEquals(expectedCiphertext, ipEncryption.encrypt(ip.getHostAddress()),
                 "encryption must be deterministic for the assertion below to be meaningful");
 
-        AccountAddressInfo info = repository.getAccountInfo(player);
-        assertEquals(List.of(ip), info.getAddresses(), "repository must decrypt stored addresses back to the original IP");
+        List<String> storedAddresses = dsl.select(AAF_LOGIN_RECORD.ADDRESS)
+                .from(AAF_LOGIN_RECORD)
+                .where(AAF_LOGIN_RECORD.MINECRAFT_UUID.eq(player.toString()))
+                .fetch(AAF_LOGIN_RECORD.ADDRESS);
+        assertEquals(List.of(expectedCiphertext), storedAddresses,
+                "repository must store the ciphertext of the address, never the plaintext");
+        assertEquals(ip.getHostAddress(), ipEncryption.decrypt(expectedCiphertext),
+                "the stored ciphertext must still decrypt to the original IP");
     }
 }
