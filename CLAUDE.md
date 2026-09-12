@@ -12,7 +12,7 @@ alternate accounts.
 The plugin is one Gradle module. `AlternateAccountFinder#onEnable` wires everything together:
 a HikariCP pool over the configured JDBC URL, Flyway migrations, a jOOQ `DSLContext`,
 `IpEncryption`, `LoginRepository`, `LoginService`, one notification service, the
-`PlayerJoinListener`, the `/aaf` executor, and bStats.
+`PlayerJoinListener`, the `/aaf` executor, bStats, and the usage-reporting `TraceClient`.
 
 - **Language / build:** Java 17, Gradle (Groovy DSL) with the Shadow and jOOQ plugins
 - **Database:** jOOQ 3.18 with Flyway migrations; embedded H2 in `MODE=MYSQL` by default,
@@ -32,6 +32,7 @@ All source lives under `src/main/java/com/dansplugins/detectionsystem/`:
 | `listeners/` | `PlayerJoinListener` |
 | `logins/` | `LoginRepository`, `LoginService`, and the `AccountInfo` / `AddressAccountInfo` value types |
 | `notifications/` | `NotificationService` and its `Mailboxes`, `Rpk` and `Message` implementations |
+| `trace/` | `TraceClient`, vendored from [trace-client-java](https://github.com/Stephenson-Software/trace-client-java) unmodified apart from the package line; do not edit it here, change it upstream and re-vendor |
 
 Resources live under `src/main/resources/`: `plugin.yml`, `config.yml`, and Flyway migrations
 under `com/dansplugins/detectionsystem/db/migration/`.

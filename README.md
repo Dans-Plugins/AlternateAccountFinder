@@ -124,6 +124,10 @@ This project is in active development.
 
 You can view the bStats page for the plugin [here](https://bstats.org/plugin/bukkit/Alternate%20Account%20Finder/9834).
 
+### Usage reporting
+
+The plugin reports when it is enabled and when one of its commands is used to the author's trace server, so it is known which plugins are actually in use. Nothing about players or the server is included, and it can be turned off — see [Usage reporting](CONFIG.md#usage-reporting) in the Configuration Guide.
+
 ## Roadmap
 
 - [Planned Features](https://github.com/Dans-Plugins/AlternateAccountFinder/issues?q=is%3Aopen+is%3Aissue+label%3AEpic)
