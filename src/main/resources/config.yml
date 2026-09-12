@@ -6,3 +6,19 @@ database:
 notify-users:
   - 0a9fa342-3139-49d7-8acb-fcf4d9c1f0ef
   - 3fcad669-b828-4d6d-be88-1c28b067c5d8
+
+# Usage reporting. When the plugin is enabled, and each time one of its
+# commands is used, a small event (plugin name, event name, plugin version)
+# is sent to the author's trace server so it is known which plugins are
+# actually in use. Nothing about players or the server is included. Sending
+# happens off the main thread, never blocks a tick, and is dropped silently
+# if the server cannot be reached. Set enabled to false to turn it off.
+usage-reporting:
+  enabled: true
+  endpoint: https://trace.danielstephenson.dev
+  # The key identifies this plugin to the trace server, so reports are
+  # attributed to AlternateAccountFinder and can be revoked as a group if they
+  # are ever abused. It is not a secret -- it ships in this file on every
+  # server that runs the plugin -- and it cannot do anything except report as
+  # this plugin. Empty means reporting is off regardless of the switch above.
+  key: "1l1DZ2blqwQQibQakphlYzopU7X-JOx8XBtIE5ucHDY"

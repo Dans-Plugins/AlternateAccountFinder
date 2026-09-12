@@ -14,9 +14,12 @@ import com.dansplugins.detectionsystem.notifications.MailboxesNotificationServic
 import com.dansplugins.detectionsystem.notifications.MessageNotificationService;
 import com.dansplugins.detectionsystem.notifications.NotificationService;
 import com.dansplugins.detectionsystem.notifications.RpkNotificationService;
+import com.dansplugins.detectionsystem.trace.TraceClient;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.flywaydb.core.Flyway;
@@ -30,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -39,6 +43,10 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     private DataSource dataSource;
     private LoginService loginService;
     private NotificationService notificationService;
+
+    // A no-op until the config has been read, so a command arriving before
+    // onEnable() finishes has something safe to report to.
+    private TraceClient trace = TraceClient.disabled();
 
     @Override
     public void onEnable() {
@@ -124,16 +132,30 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         // Listeners
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
-        // Commands
-        getCommand("aaf").setExecutor(new AafCommand(this));
+        // Commands. Each use is reported before the command runs; see config.yml. The executor
+        // is no longer the AafCommand itself, so Bukkit's fallback of asking the executor for
+        // completions no longer applies and the completer has to be set explicitly.
+        AafCommand aafCommand = new AafCommand(this);
+        PluginCommand aaf = getCommand("aaf");
+        aaf.setExecutor((sender, command, label, args) -> {
+            trace.report("command", null, Collections.singletonMap("name", command.getName()));
+            return aafCommand.onCommand(sender, command, label, args);
+        });
+        aaf.setTabCompleter(aafCommand);
 
         // Metrics
         int pluginId = 9834;
         new Metrics(this, pluginId);
+
+        // usage reporting: one event now, one per command; see config.yml
+        trace = buildTraceClient(getConfig(), getName(), getLogger());
+        trace.report("startup", null, Collections.singletonMap("version", getDescription().getVersion()));
     }
 
     @Override
     public void onDisable() {
+        trace.close();
+
         // Bukkit keeps the JVM alive across a plugin disable, so a pool that is not closed here
         // survives every /reload and every plugin-manager disable with its connections and
         // housekeeping threads intact, while the next onEnable builds a second one alongside it.
@@ -162,6 +184,33 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         } catch (Exception exception) {
             logger.log(WARNING, "Failed to close the database connection pool", exception);
         }
+    }
+
+    /**
+     * Builds the usage-reporting client from the {@code usage-reporting} block of {@code config},
+     * reporting as {@code application}.
+     *
+     * <p>The one-argument getters, deliberately. {@code saveDefaultConfig()} never touches a
+     * {@code config.yml} that already exists, so a server upgraded from a version before usage
+     * reporting has no {@code usage-reporting} block on disk. Bukkit registers the jar's
+     * {@code config.yml} as the defaults for that file, and the one-argument getters fall through
+     * to them -- but the two-argument getters return their explicit fallback instead, which for
+     * the key would be {@code ""} and would turn reporting off on every existing installation.
+     * Verified against {@code YamlConfiguration} in {@code AlternateAccountFinderTest}, not
+     * assumed.
+     *
+     * <p>A missing endpoint falls back to the author's server and a missing key to {@code ""},
+     * which the client treats as "off" -- both only reachable if the bundled {@code config.yml}
+     * itself has lost the block.
+     */
+    static TraceClient buildTraceClient(ConfigurationSection config, String application, Logger logger) {
+        String endpoint = config.getString("usage-reporting.endpoint");
+        String key = config.getString("usage-reporting.key");
+        return TraceClient.builder(endpoint != null ? endpoint : "https://trace.danielstephenson.dev", application)
+                .key(key != null ? key : "")
+                .enabled(config.getBoolean("usage-reporting.enabled"))
+                .logger(logger)
+                .build();
     }
 
     /**
