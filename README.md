@@ -124,9 +124,17 @@ This project is in active development.
 
 You can view the bStats page for the plugin [here](https://bstats.org/plugin/bukkit/Alternate%20Account%20Finder/9834).
 
-### Usage reporting
+## Usage reporting
 
-The plugin reports when it is enabled and when one of its commands is used to the author's trace server, so it is known which plugins are actually in use. Nothing about players or the server is included, and it can be turned off — see [Usage reporting](CONFIG.md#usage-reporting) in the Configuration Guide.
+Usage reporting is on by default: when the plugin is enabled, and each time one of its commands is used, it sends its name, its version and the command's name to the author's trace server at `https://trace.danielstephenson.dev`, so it is known which plugins are actually in use. Nothing about players, worlds, IP addresses or the server is sent, and nothing typed after a command. The plugin prints one line on every startup saying whether reporting is on and, if not, why.
+
+To turn it off:
+
+- for this plugin only: `usage-reporting.enabled: false` in `plugins/AlternateAccountFinder/config.yml`
+- for every plugin on the server that reports to trace: `enabled: false` in `plugins/trace/config.yml` (created on first start; plugins never turn it back on)
+- for the whole server process: the environment variable `TRACE_USAGE_REPORTING=off` or `DO_NOT_TRACK=1`
+
+Details: https://github.com/Stephenson-Software/trace#usage-reporting
 
 ## Roadmap
 

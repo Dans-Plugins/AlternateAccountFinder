@@ -19,7 +19,9 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.flywaydb.core.Flyway;
@@ -51,6 +53,9 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        if (copyBundledUsageReportingBlock(getConfig())) {
+            saveConfig();
+        }
 
         // Configuration is validated before anything is opened, so a rejected dialect leaves no
         // connection pool behind.
@@ -148,7 +153,8 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         new Metrics(this, pluginId);
 
         // usage reporting: one event now, one per command; see config.yml
-        trace = buildTraceClient(getConfig(), getName(), getLogger());
+        trace = buildTraceClient(getConfig(), getName(), getLogger(), getDataFolder().getParentFile());
+        getLogger().info(usageReportingNotice(getName(), trace.disabledReason()));
         trace.report("startup", null, Collections.singletonMap("version", getDescription().getVersion()));
     }
 
@@ -202,15 +208,61 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
      * <p>A missing endpoint falls back to the author's server and a missing key to {@code ""},
      * which the client treats as "off" -- both only reachable if the bundled {@code config.yml}
      * itself has lost the block.
+     *
+     * <p>{@code pluginsDirectory} is the server's {@code plugins/} folder, where the client keeps the
+     * server-wide switch {@code plugins/trace/config.yml}: created with {@code enabled: true} if it
+     * is missing, and honoured if an operator sets it to {@code false}. {@code null} skips it.
      */
-    static TraceClient buildTraceClient(ConfigurationSection config, String application, Logger logger) {
+    static TraceClient buildTraceClient(ConfigurationSection config, String application, Logger logger, File pluginsDirectory) {
         String endpoint = config.getString("usage-reporting.endpoint");
         String key = config.getString("usage-reporting.key");
         return TraceClient.builder(endpoint != null ? endpoint : "https://trace.danielstephenson.dev", application)
                 .key(key != null ? key : "")
                 .enabled(config.getBoolean("usage-reporting.enabled"))
+                .serverWideConfig(pluginsDirectory)
                 .logger(logger)
                 .build();
+    }
+
+    /**
+     * Copies the bundled {@code usage-reporting} block into {@code config} when the file on disk
+     * has none: an operator's {@code config.yml} from a version before usage reporting existed,
+     * which {@code saveDefaultConfig()} never rewrites. Reporting was already active on such a
+     * server through the one-argument getters above; this makes the switch visible in the file
+     * so it can be found and turned off. The values are the jar's defaults, not new literals.
+     *
+     * @return whether anything was copied, in which case the caller saves the file
+     */
+    static boolean copyBundledUsageReportingBlock(FileConfiguration config) {
+        if (config.isSet("usage-reporting")) {
+            return false;
+        }
+        Configuration defaults = config.getDefaults();
+        if (defaults == null || !defaults.isSet("usage-reporting")) {
+            return false;
+        }
+        for (String key : List.of("usage-reporting.enabled", "usage-reporting.endpoint", "usage-reporting.key")) {
+            config.set(key, defaults.get(key));
+        }
+        return true;
+    }
+
+    /**
+     * The one console line, every startup, that says whether usage reporting is on, what is sent,
+     * and how to turn it off.
+     *
+     * @param pluginName     the name this plugin reports as
+     * @param disabledReason {@link TraceClient#disabledReason()}: {@code null} when reporting is on
+     */
+    static String usageReportingNotice(String pluginName, String disabledReason) {
+        if (disabledReason != null) {
+            return "Usage reporting is off (" + disabledReason + ").";
+        }
+        return "Usage reporting is on: " + pluginName + " sends its name, version and command names to "
+                + "https://trace.danielstephenson.dev - nothing about players or the server. "
+                + "Turn it off with usage-reporting.enabled: false in this plugin's config.yml, "
+                + "or for every plugin with enabled: false in plugins/trace/config.yml. "
+                + "Details: https://github.com/Stephenson-Software/trace#usage-reporting";
     }
 
     /**

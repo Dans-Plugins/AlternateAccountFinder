@@ -6,14 +6,18 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jooq.SQLDialect;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -177,7 +181,7 @@ class AlternateAccountFinderTest {
         onDisk.set("database.dialect", "H2");
         onDisk.setDefaults(bundledConfig());
 
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()));
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), null);
 
         assertTrue(trace.isEnabled());
         trace.close();
@@ -205,7 +209,7 @@ class AlternateAccountFinderTest {
         onDisk.set("usage-reporting.enabled", false);
         onDisk.setDefaults(bundledConfig());
 
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()));
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), null);
 
         assertFalse(trace.isEnabled());
     }
@@ -216,7 +220,7 @@ class AlternateAccountFinderTest {
         onDisk.set("usage-reporting.key", "");
         onDisk.setDefaults(bundledConfig());
 
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()));
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), null);
 
         assertFalse(trace.isEnabled());
     }
@@ -225,9 +229,87 @@ class AlternateAccountFinderTest {
     void staysOffWhenNoConfigCarriesTheBlockAtAll() {
         // Only reachable if the bundled config.yml itself has lost the block; the fallbacks are
         // then the author's endpoint and an empty key, and an empty key means off.
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(new YamlConfiguration(), "AlternateAccountFinder", recordingLogger(new ArrayList<>()));
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(new YamlConfiguration(), "AlternateAccountFinder", recordingLogger(new ArrayList<>()), null);
 
         assertFalse(trace.isEnabled());
+    }
+
+    @Test
+    void theServerWideSwitchWinsOverThePluginsOwnConfig(@TempDir Path plugins) throws IOException {
+        // plugins/trace/config.yml is shared by every plugin on the server that reports to trace;
+        // enabled: false there turns this plugin off even though its own config says on, and the
+        // reason names the file so the startup line points the operator at it.
+        Path serverWide = plugins.resolve("trace").resolve("config.yml");
+        Files.createDirectories(serverWide.getParent());
+        Files.writeString(serverWide, "enabled: false\n");
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.setDefaults(bundledConfig());
+
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), plugins.toFile());
+
+        assertFalse(trace.isEnabled());
+        assertEquals(TraceClient.REASON_SERVER_WIDE, trace.disabledReason());
+    }
+
+    @Test
+    void createsTheServerWideSwitchWhenItIsMissing(@TempDir Path plugins) {
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.setDefaults(bundledConfig());
+
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), plugins.toFile());
+
+        assertTrue(Files.exists(plugins.resolve("trace").resolve("config.yml")));
+        assertTrue(trace.isEnabled(), "a freshly created switch file means enabled");
+        trace.close();
+    }
+
+    @Test
+    void copiesTheBundledUsageReportingBlockOntoAConfigThatPredatesIt() {
+        // The operator's file has no usage-reporting block; the bundled defaults are behind it.
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.set("database.dialect", "H2");
+        onDisk.setDefaults(bundledConfig());
+        assertFalse(onDisk.isSet("usage-reporting"), "the on-disk file must lack the block for this test to mean anything");
+
+        assertTrue(AlternateAccountFinder.copyBundledUsageReportingBlock(onDisk));
+
+        // Now in the file itself (read without falling through to the defaults), with the jar's
+        // values, and a second pass has nothing to do.
+        assertEquals(bundledConfig().get("usage-reporting.key"), onDisk.get("usage-reporting.key", null));
+        assertEquals(bundledConfig().get("usage-reporting.endpoint"), onDisk.get("usage-reporting.endpoint", null));
+        assertEquals(Boolean.TRUE, onDisk.get("usage-reporting.enabled", null));
+        assertEquals("H2", onDisk.getString("database.dialect"), "everything else is left alone");
+        assertFalse(AlternateAccountFinder.copyBundledUsageReportingBlock(onDisk));
+    }
+
+    @Test
+    void leavesAnOperatorsOwnUsageReportingBlockAlone() {
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.set("usage-reporting.enabled", false);
+        onDisk.setDefaults(bundledConfig());
+
+        assertFalse(AlternateAccountFinder.copyBundledUsageReportingBlock(onDisk));
+
+        assertFalse(onDisk.getBoolean("usage-reporting.enabled"));
+        assertFalse(onDisk.isSet("usage-reporting.key"), "an operator's block is not completed from the jar");
+    }
+
+    @Test
+    void theStartupNoticeSaysWhatIsSentAndWhereToTurnItOff() {
+        String on = AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", null);
+
+        assertTrue(on.startsWith("Usage reporting is on: AlternateAccountFinder sends its name, version and command names to https://trace.danielstephenson.dev"), on);
+        assertTrue(on.contains("usage-reporting.enabled: false"), on);
+        assertTrue(on.contains("plugins/trace/config.yml"), on);
+        assertTrue(on.endsWith("Details: https://github.com/Stephenson-Software/trace#usage-reporting"), on);
+    }
+
+    @Test
+    void theStartupNoticeSaysWhyReportingIsOff() {
+        assertEquals("Usage reporting is off (config.yml).",
+                AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", TraceClient.REASON_CONFIG));
+        assertEquals("Usage reporting is off (server-wide config: plugins/trace/config.yml).",
+                AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", TraceClient.REASON_SERVER_WIDE));
     }
 
     /**
