@@ -80,6 +80,12 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
             getLogger().log(SEVERE, "Failed to load MariaDB driver", exception);
         }
 
+        // The three steps below are the ones that can fail after the dialect check. Each failure
+        // is caught here rather than left to propagate, because the two server platforms disagree
+        // about an exception out of onEnable: Paper disables the plugin, Spigot logs it and moves
+        // on with the enabled flag already set, leaving /aaf without an executor, no join listener
+        // and -- for anything after the pool is built -- an open connection pool (issue #111).
+
         // Connection pool
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getConfig().getString("database.url"));
@@ -91,7 +97,12 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         if (databasePassword != null) {
             hikariConfig.setPassword(databasePassword);
         }
-        dataSource = new HikariDataSource(hikariConfig);
+        try {
+            dataSource = new HikariDataSource(hikariConfig);
+        } catch (RuntimeException exception) {
+            abortStartup(StartupStep.CONNECTION_POOL, exception);
+            return;
+        }
 
         // Migrations
         Flyway flyway = Flyway.configure(getClassLoader())
@@ -102,7 +113,12 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
                 .baselineVersion("0")
                 .validateOnMigrate(false)
                 .load();
-        flyway.migrate();
+        try {
+            flyway.migrate();
+        } catch (RuntimeException exception) {
+            abortStartup(StartupStep.MIGRATIONS, exception);
+            return;
+        }
 
         // jOOQ
         System.setProperty("org.jooq.no-logo", "true");
@@ -115,8 +131,14 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         );
 
         // Encryption
-        IpEncryption ipEncryption = new IpEncryption(getLogger(), getDataFolder());
-        
+        IpEncryption ipEncryption;
+        try {
+            ipEncryption = new IpEncryption(getLogger(), getDataFolder());
+        } catch (RuntimeException exception) {
+            abortStartup(StartupStep.ENCRYPTION_KEY, exception);
+            return;
+        }
+
         // Migrate existing plaintext IP addresses to encrypted format
         migrateExistingIpAddresses(dsl, ipEncryption);
 
@@ -190,6 +212,70 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         } catch (Exception exception) {
             logger.log(WARNING, "Failed to close the database connection pool", exception);
         }
+    }
+
+    /**
+     * The startup steps after the dialect check that can fail, in the order {@code onEnable}
+     * runs them. Each carries what it was doing, for the failure message, and what an operator
+     * can do about it. None of the guidance can name a player address: nothing at these steps
+     * has read one yet.
+     */
+    enum StartupStep {
+        CONNECTION_POOL("opening the database connection pool",
+                "Check database.url, database.username and database.password in config.yml, "
+                        + "and that the database is reachable from this server."),
+        MIGRATIONS("applying the database migrations",
+                "Check the database user's privileges and the messages above before restarting "
+                        + "the server."),
+        // One catch covers every way IpEncryption can fail -- a key file of the wrong size, one
+        // that cannot be read, and a fresh install whose data folder cannot be written -- so the
+        // guidance has to fit all three rather than send a first-time operator hunting for a
+        // backup that never existed.
+        ENCRYPTION_KEY("loading the IP encryption key",
+                "If ip-encryption.key exists in the plugin data folder, restore it from a backup "
+                        + "rather than deleting it: a replacement key makes every stored address "
+                        + "unreadable. If it does not exist yet, check that the data folder can be "
+                        + "read and written.");
+
+        private final String activity;
+        private final String guidance;
+
+        StartupStep(String activity, String guidance) {
+            this.activity = activity;
+            this.guidance = guidance;
+        }
+    }
+
+    /**
+     * The one {@code SEVERE} line that says which startup step failed, why, and what to do,
+     * followed by the plugin disabling itself. Read together with the stack trace logged
+     * alongside it.
+     *
+     * @param cause the failure; its message is quoted verbatim, or {@code null} is spelled out
+     *              rather than printed, since a message-less exception is what Hikari's and
+     *              Flyway's wrappers sometimes carry
+     */
+    static String startupFailureMessage(StartupStep step, Throwable cause) {
+        String reason = cause.getMessage() != null ? cause.getMessage() : cause.getClass().getSimpleName();
+        return "Failed while " + step.activity + ": " + reason + " " + step.guidance
+                + " The plugin has disabled itself.";
+    }
+
+    /**
+     * Ends a startup that cannot continue: logs {@link #startupFailureMessage} with the stack
+     * trace, releases the connection pool if one was opened, and disables the plugin -- the same
+     * outcome on Spigot as Paper's loader produces on its own for an uncaught exception, and the
+     * one the dialect check already produces (#101).
+     *
+     * <p>The pool is closed here rather than left to {@code onDisable} so the release does not
+     * depend on which platform's loader is running this, and the field is cleared so
+     * {@code onDisable} finds nothing to close a second time.
+     */
+    private void abortStartup(StartupStep step, RuntimeException cause) {
+        getLogger().log(SEVERE, startupFailureMessage(step, cause), cause);
+        closeDataSource(dataSource, getLogger());
+        dataSource = null;
+        getServer().getPluginManager().disablePlugin(this);
     }
 
     /**

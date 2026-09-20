@@ -1,5 +1,6 @@
 package com.dansplugins.detectionsystem;
 
+import com.dansplugins.detectionsystem.encryption.IpEncryption;
 import com.dansplugins.detectionsystem.trace.TraceClient;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -35,13 +36,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests for the connection-pool shutdown helper (issue #97), the dialect parser (issue #101) and
- * the usage-reporting client builder.
+ * Tests for the connection-pool shutdown helper (issue #97), the dialect parser (issue #101), the
+ * startup-failure message (issue #111) and the usage-reporting client builder.
  *
  * <p>{@link AlternateAccountFinder} extends {@code JavaPlugin} and cannot be constructed outside a
  * running server, so neither {@code onDisable} nor {@code onEnable} is covered here — only the
  * static helpers they delegate to. That those helpers are actually wired in, and that a rejected
- * dialect disables the plugin rather than throwing, stay manual checks on a live server.
+ * dialect, an unreachable database, a failed migration or a corrupted key file disables the plugin
+ * rather than throwing, stay manual checks on a live server.
  */
 class AlternateAccountFinderTest {
 
@@ -109,6 +111,65 @@ class AlternateAccountFinderTest {
         assertEquals(1, logged.size());
         assertEquals(Level.WARNING, logged.get(0).getLevel());
         assertEquals("pool is stuck", logged.get(0).getThrown().getMessage());
+    }
+
+    @Test
+    void theStartupFailureMessageNamesTheStepTheCauseAndTheRemedy() {
+        String message = AlternateAccountFinder.startupFailureMessage(
+                AlternateAccountFinder.StartupStep.CONNECTION_POOL,
+                new RuntimeException("Failed to initialize pool: Connection refused"));
+
+        assertTrue(message.startsWith("Failed while opening the database connection pool: "), message);
+        assertTrue(message.contains("Failed to initialize pool: Connection refused"), message);
+        assertTrue(message.contains("database.url"), message);
+        assertTrue(message.contains("config.yml"), message);
+        assertTrue(message.endsWith("The plugin has disabled itself."), message);
+    }
+
+    @Test
+    void theStartupFailureMessageSpellsOutAMessageLessCause() {
+        // Hikari's and Flyway's wrappers do not always carry a message; "null" in the console
+        // would send an operator looking for a bug that is not there.
+        String message = AlternateAccountFinder.startupFailureMessage(
+                AlternateAccountFinder.StartupStep.MIGRATIONS, new IllegalStateException());
+
+        assertTrue(message.startsWith("Failed while applying the database migrations: IllegalStateException "), message);
+        assertFalse(message.contains("null"), message);
+    }
+
+    @Test
+    void theCorruptedKeyFailureKeepsTheRestoreFromBackupGuidance(@TempDir Path dataFolder) throws IOException {
+        // The exception is the real one: a key file that is not 32 bytes is what IpEncryption
+        // rejects, and USER_GUIDE.md promises that the plugin fails to enable and that the file
+        // should be restored rather than deleted. That guidance now has to survive into the one
+        // line an operator reads before the plugin disables itself.
+        Files.write(dataFolder.resolve("ip-encryption.key"), new byte[31]);
+        RuntimeException cause = assertThrows(RuntimeException.class,
+                () -> new IpEncryption(recordingLogger(new ArrayList<>()), dataFolder.toFile()));
+
+        String message = AlternateAccountFinder.startupFailureMessage(
+                AlternateAccountFinder.StartupStep.ENCRYPTION_KEY, cause);
+
+        assertTrue(message.startsWith("Failed while loading the IP encryption key: Corrupted encryption key file."), message);
+        assertTrue(message.contains("ip-encryption.key"), message);
+        assertTrue(message.contains("restore it from a backup rather than deleting it"), message);
+    }
+
+    @Test
+    void theKeyFailureGuidanceAlsoFitsAFreshInstallThatCannotWriteTheKey(@TempDir Path dataFolder) throws IOException {
+        // The same catch covers a first startup whose data folder cannot be written, where there
+        // is no key file, no backup and nothing stored; the line must not read as if there were.
+        // A regular file where the data folder should be makes createDirectories fail.
+        Path notAFolder = dataFolder.resolve("AlternateAccountFinder");
+        Files.writeString(notAFolder, "");
+        RuntimeException cause = assertThrows(RuntimeException.class,
+                () -> new IpEncryption(recordingLogger(new ArrayList<>()), notAFolder.toFile()));
+
+        String message = AlternateAccountFinder.startupFailureMessage(
+                AlternateAccountFinder.StartupStep.ENCRYPTION_KEY, cause);
+
+        assertTrue(message.startsWith("Failed while loading the IP encryption key: Key generation failed"), message);
+        assertTrue(message.contains("If it does not exist yet, check that the data folder can be read and written."), message);
     }
 
     @Test
