@@ -10,7 +10,7 @@ The plugin also writes two non-configuration files into the same folder — see 
 
 **Type:** string  
 **Default:** `jdbc:h2:./plugins/AlternateAccountFinder/aaf;AUTO_SERVER=true;MODE=MYSQL;DATABASE_TO_UPPER=false`  
-**Description:** The JDBC connection URL for the plugin's data store. The default uses an embedded H2 database stored in the plugin's data folder. To use MariaDB/MySQL instead, replace this with a `jdbc:mariadb://` URL and set `database.dialect` to `MARIADB`.
+**Description:** The JDBC connection URL for the plugin's data store. The default uses an embedded H2 database stored in the plugin's data folder. To use MariaDB/MySQL instead, replace this with a `jdbc:mariadb://` URL and set `database.dialect` to `MARIADB`. If no connection can be made at startup, the plugin reports which of `database.url`, `database.username` and `database.password` to check and disables itself rather than running without a database.
 
 **Example (H2 — default):**
 
@@ -153,7 +153,7 @@ too.
 
 ### ip-encryption.key
 
-Losing this file means every IP address already stored becomes permanently unreadable, and the plugin will generate a replacement key and carry on rather than stopping. The [User Guide](USER_GUIDE.md#back-up-the-key-file) describes exactly which lookups stop working. If the file is present but not exactly 32 bytes, the plugin treats it as corrupted and fails to enable — restore it from a backup rather than deleting it.
+Losing this file means every IP address already stored becomes permanently unreadable, and the plugin will generate a replacement key and carry on rather than stopping. The [User Guide](USER_GUIDE.md#back-up-the-key-file) describes exactly which lookups stop working. If the file is present but not exactly 32 bytes, the plugin treats it as corrupted, reports it in the console and disables itself — restore it from a backup rather than deleting it.
 
 ### ip-migration-v2.complete
 

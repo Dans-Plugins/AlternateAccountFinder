@@ -42,7 +42,7 @@ If the key file is missing when the server starts, the plugin does not stop — 
 
 There is no way to recover the old addresses without the original key file. The startup migration will not touch those rows: an address it can neither decrypt nor read as a plaintext IP is left exactly as stored and reported in the log by account UUID, so restoring the original key file later still recovers them.
 
-If the key file exists but is not exactly 32 bytes, the plugin treats it as corrupted and fails to enable rather than quietly generating a replacement — the server keeps running without it. Restore the file from a backup instead of deleting it.
+If the key file exists but is not exactly 32 bytes, the plugin treats it as corrupted and disables itself rather than quietly generating a replacement — the console shows one message saying the key could not be loaded and that the file should be restored, and the server keeps running without the plugin. Restore the file from a backup instead of deleting it.
 
 ## Common Scenarios
 
