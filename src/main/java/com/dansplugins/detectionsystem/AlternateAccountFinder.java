@@ -227,9 +227,15 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         MIGRATIONS("applying the database migrations",
                 "Check the database user's privileges and the messages above before restarting "
                         + "the server."),
+        // One catch covers every way IpEncryption can fail -- a key file of the wrong size, one
+        // that cannot be read, and a fresh install whose data folder cannot be written -- so the
+        // guidance has to fit all three rather than send a first-time operator hunting for a
+        // backup that never existed.
         ENCRYPTION_KEY("loading the IP encryption key",
-                "Restore ip-encryption.key in the plugin data folder from a backup. Do not delete "
-                        + "it: a replacement key makes every stored address unreadable.");
+                "If ip-encryption.key exists in the plugin data folder, restore it from a backup "
+                        + "rather than deleting it: a replacement key makes every stored address "
+                        + "unreadable. If it does not exist yet, check that the data folder can be "
+                        + "read and written.");
 
         private final String activity;
         private final String guidance;

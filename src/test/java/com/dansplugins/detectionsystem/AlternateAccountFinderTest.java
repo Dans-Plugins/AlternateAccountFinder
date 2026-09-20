@@ -152,8 +152,24 @@ class AlternateAccountFinderTest {
 
         assertTrue(message.startsWith("Failed while loading the IP encryption key: Corrupted encryption key file."), message);
         assertTrue(message.contains("ip-encryption.key"), message);
-        assertTrue(message.contains("backup"), message);
-        assertTrue(message.contains("Do not delete it"), message);
+        assertTrue(message.contains("restore it from a backup rather than deleting it"), message);
+    }
+
+    @Test
+    void theKeyFailureGuidanceAlsoFitsAFreshInstallThatCannotWriteTheKey(@TempDir Path dataFolder) throws IOException {
+        // The same catch covers a first startup whose data folder cannot be written, where there
+        // is no key file, no backup and nothing stored; the line must not read as if there were.
+        // A regular file where the data folder should be makes createDirectories fail.
+        Path notAFolder = dataFolder.resolve("AlternateAccountFinder");
+        Files.writeString(notAFolder, "");
+        RuntimeException cause = assertThrows(RuntimeException.class,
+                () -> new IpEncryption(recordingLogger(new ArrayList<>()), notAFolder.toFile()));
+
+        String message = AlternateAccountFinder.startupFailureMessage(
+                AlternateAccountFinder.StartupStep.ENCRYPTION_KEY, cause);
+
+        assertTrue(message.startsWith("Failed while loading the IP encryption key: Key generation failed"), message);
+        assertTrue(message.contains("If it does not exist yet, check that the data folder can be read and written."), message);
     }
 
     @Test
