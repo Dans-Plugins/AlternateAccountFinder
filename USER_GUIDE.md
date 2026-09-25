@@ -85,9 +85,11 @@ Both commands above have to be typed by somebody who already suspects something.
 The announcement fires when both of these hold:
 
 - the joining account has never been seen from that IP address before, and
-- that IP address already has at least one other account on record.
+- the joining account shares at least one recorded IP address with another account — the address it has just joined from, or any other address it has logged in from before.
 
-Only that account's first join from that address triggers it. An account that keeps connecting from the same address is not re-announced, so a busy shared address does not produce a message on every join.
+The second condition looks at every address on the account's record, not only the one it has just joined from. So an account already linked to others is announced again each time it joins from an address it has not used before, even when no other account has used that new address. The announcement then lists every account it shares any address with, which is the same list `/aaf alts` gives.
+
+Only that account's first join from a given address triggers it. An account that keeps connecting from the same address is not re-announced, so a busy shared address does not produce a message on every join.
 
 When it fires, two things happen. The server log gains a line naming the joining player and the accounts it shares an address with:
 
