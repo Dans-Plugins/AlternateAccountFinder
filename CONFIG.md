@@ -77,7 +77,7 @@ database:
 
 **Type:** list of UUIDs  
 **Default:** *(example UUIDs — replace with your own)*  
-**Description:** A list of player UUIDs that will be notified when a player joins for the *first time* from a given IP and that IP already has at least one other associated account on record. Notifications are not re-sent for subsequent joins from the same IP. Remove all entries or leave the list empty to disable notifications.
+**Description:** A list of player UUIDs that will be notified when a player joins for the *first time* from a given IP and, at that point, shares at least one recorded IP with another account. That shared IP can be the one just joined from or any earlier one, so an account already linked to others is announced again on its first join from each new IP. Notifications are not re-sent for subsequent joins from the same IP. The [User Guide](USER_GUIDE.md#being-told-about-a-suspected-alt-without-running-a-command) describes the notification in full. Remove all entries or leave the list empty to disable notifications.
 
 Notification delivery depends on which optional plugins are installed:
 
