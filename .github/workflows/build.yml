@@ -27,3 +27,12 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build
+
+      # Every Bukkit class, field and method the jar uses must exist on each Minecraft
+      # version in minecraft-versions.json, and its bytecode must fit the Java each runs on.
+      # See https://github.com/Dans-Plugins/release-gates#api-compatibility-check
+      - name: Check Bukkit API use against every supported Minecraft version
+        run: |
+          curl -fsSL -o /tmp/check_api_compat.py \
+            https://raw.githubusercontent.com/Dans-Plugins/release-gates/v11/gates/check_api_compat.py
+          python3 /tmp/check_api_compat.py --versions minecraft-versions.json target build/libs
