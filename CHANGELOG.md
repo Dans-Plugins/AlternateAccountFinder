@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- The vendored trace client is now 0.3.0. `plugins/trace/config.yml` can now carry a `tags:` block whose entries are added to every usage event reported by the plugins on that server, with an event's own tag winning on a key clash; release test servers write `ci: "true"` there so their boots are left out of real-installation figures. A server without a `tags:` block reports exactly as before. Details: https://github.com/Stephenson-Software/trace-client-java/releases/tag/0.3.0.
+
 ### Fixed
 
 - The [User Guide](USER_GUIDE.md) and [Configuration Guide](CONFIG.md) now describe when the join-time alt notification actually fires. They said it needed the address just joined from to already have another account on record. In fact the plugin checks every address the joining account has used, so an account already linked to others is announced again on its first join from each new address, even one nobody else has used. The behaviour itself is unchanged.
