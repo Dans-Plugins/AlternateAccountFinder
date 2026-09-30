@@ -175,9 +175,9 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         new Metrics(this, pluginId);
 
         // usage reporting: one event now, one per command; see config.yml
-        trace = buildTraceClient(getConfig(), getName(), getLogger(), getDataFolder().getParentFile());
+        trace = buildTraceClient(getConfig(), getName(), getDescription().getVersion(), getLogger(), getDataFolder().getParentFile());
         getLogger().info(usageReportingNotice(getName(), trace.disabledReason()));
-        trace.report("startup", null, Collections.singletonMap("version", getDescription().getVersion()));
+        trace.report("startup");
     }
 
     @Override
@@ -299,10 +299,10 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
      * server-wide switch {@code plugins/trace/config.yml}: created with {@code enabled: true} if it
      * is missing, and honoured if an operator sets it to {@code false}. {@code null} skips it.
      */
-    static TraceClient buildTraceClient(ConfigurationSection config, String application, Logger logger, File pluginsDirectory) {
+    static TraceClient buildTraceClient(ConfigurationSection config, String application, String version, Logger logger, File pluginsDirectory) {
         String endpoint = config.getString("usage-reporting.endpoint");
         String key = config.getString("usage-reporting.key");
-        return TraceClient.builder(endpoint != null ? endpoint : "https://trace.danielstephenson.dev", application)
+        return TraceClient.builder(endpoint != null ? endpoint : "https://trace.danielstephenson.dev", application, version)
                 .key(key != null ? key : "")
                 .enabled(config.getBoolean("usage-reporting.enabled"))
                 .serverWideConfig(pluginsDirectory)
