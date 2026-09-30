@@ -242,7 +242,7 @@ class AlternateAccountFinderTest {
         onDisk.set("database.dialect", "H2");
         onDisk.setDefaults(bundledConfig());
 
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), null);
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
 
         assertTrue(trace.isEnabled());
         trace.close();
@@ -270,7 +270,7 @@ class AlternateAccountFinderTest {
         onDisk.set("usage-reporting.enabled", false);
         onDisk.setDefaults(bundledConfig());
 
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), null);
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
 
         assertFalse(trace.isEnabled());
     }
@@ -281,7 +281,7 @@ class AlternateAccountFinderTest {
         onDisk.set("usage-reporting.key", "");
         onDisk.setDefaults(bundledConfig());
 
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), null);
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
 
         assertFalse(trace.isEnabled());
     }
@@ -290,7 +290,7 @@ class AlternateAccountFinderTest {
     void staysOffWhenNoConfigCarriesTheBlockAtAll() {
         // Only reachable if the bundled config.yml itself has lost the block; the fallbacks are
         // then the author's endpoint and an empty key, and an empty key means off.
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(new YamlConfiguration(), "AlternateAccountFinder", recordingLogger(new ArrayList<>()), null);
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(new YamlConfiguration(), "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
 
         assertFalse(trace.isEnabled());
     }
@@ -306,7 +306,7 @@ class AlternateAccountFinderTest {
         YamlConfiguration onDisk = new YamlConfiguration();
         onDisk.setDefaults(bundledConfig());
 
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), plugins.toFile());
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), plugins.toFile());
 
         assertFalse(trace.isEnabled());
         assertEquals(TraceClient.REASON_SERVER_WIDE, trace.disabledReason());
@@ -317,7 +317,7 @@ class AlternateAccountFinderTest {
         YamlConfiguration onDisk = new YamlConfiguration();
         onDisk.setDefaults(bundledConfig());
 
-        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", recordingLogger(new ArrayList<>()), plugins.toFile());
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), plugins.toFile());
 
         assertTrue(Files.exists(plugins.resolve("trace").resolve("config.yml")));
         assertTrue(trace.isEnabled(), "a freshly created switch file means enabled");
