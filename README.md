@@ -129,7 +129,11 @@ You can view the bStats page for the plugin [here](https://bstats.org/plugin/buk
 
 ## Usage reporting
 
-Usage reporting is on by default: when the plugin is enabled, and each time one of its commands is used, it sends its name, its version and the command's name to the author's trace server at `https://trace.danielstephenson.dev`, so it is known which plugins are actually in use. Nothing about players, worlds, IP addresses or the server is sent, and nothing typed after a command. The plugin prints one line on every startup saying whether reporting is on and, if not, why.
+Usage reporting is on by default: when the plugin is enabled, and each time one of its commands is used, it sends its name, its version and the command's name to the author's trace server at `https://trace.danielstephenson.dev`, so it is known which plugins are actually in use. Nothing about players, worlds or IP addresses is sent, and nothing typed after a command. The plugin prints one line on every startup saying whether reporting is on and, if not, why.
+
+Each event also carries a random server ID (the `server-id` line in `plugins/trace/config.yml`) so
+servers can be counted rather than events. It identifies no person, account or IP address; delete
+the line to get a new one.
 
 To turn it off:
 
