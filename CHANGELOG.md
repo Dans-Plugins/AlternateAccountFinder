@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - The [User Guide](USER_GUIDE.md) and [Configuration Guide](CONFIG.md) now describe when the join-time alt notification actually fires. They said it needed the address just joined from to already have another account on record. In fact the plugin checks every address the joining account has used, so an account already linked to others is announced again on its first join from each new address, even one nobody else has used. The behaviour itself is unchanged.
+- The [User Guide](USER_GUIDE.md) prerequisites no longer present every server from API version 1.17 upwards as supported. They now point at the tested versions listed in the README, say that 1.17 and 1.18 servers load the plugin but fall outside the range the README expects to work, and state the Java 17 requirement. Nothing about the plugin itself has changed.
 
 ## [3.0.0] – 2026-09-24
 
