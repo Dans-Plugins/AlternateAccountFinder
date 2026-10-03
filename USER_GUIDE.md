@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- A Minecraft server running Spigot or a fork of it such as Paper, on one of the versions listed under [Supported Minecraft Versions](README.md#supported-minecraft-versions) in the README. The plugin declares API version 1.17, so a 1.17 or 1.18 server will load it, but versions older than 1.19.4 are not tested.
+- A Minecraft server running Spigot or a fork of it such as Paper, on one of the versions listed under [Supported Minecraft Versions](README.md#supported-minecraft-versions) in the README. The plugin declares API version 1.17, so a 1.17 or 1.18 server will load it, but only the listed versions are tested, and 1.17 and 1.18 fall outside the range the README expects to work (1.19.4 onwards).
 - Java 17 or newer, which the plugin is compiled for.
 - Operator (`op`) privileges on the server, or the relevant `aaf.*` permissions granted to your role.
 
