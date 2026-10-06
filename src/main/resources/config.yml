@@ -22,7 +22,7 @@ notify-users:
 # on by a plugin). The environment variables TRACE_USAGE_REPORTING=off and
 # DO_NOT_TRACK=1 turn it off for the whole server process. The plugin says
 # on every startup whether reporting is on and why not, if it is off.
-# Details: https://github.com/Stephenson-Software/trace#usage-reporting
+# Details: https://danielstephenson.dev/usage-reporting
 usage-reporting:
   enabled: true
   endpoint: https://trace.danielstephenson.dev

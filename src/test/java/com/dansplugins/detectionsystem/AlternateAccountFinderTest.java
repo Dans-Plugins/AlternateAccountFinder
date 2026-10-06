@@ -363,7 +363,7 @@ class AlternateAccountFinderTest {
         assertTrue(on.contains(", plus a random server ID (server-id in plugins/trace/config.yml) - nothing about players."), on);
         assertTrue(on.contains("usage-reporting.enabled: false"), on);
         assertTrue(on.contains("plugins/trace/config.yml"), on);
-        assertTrue(on.endsWith("Details: https://github.com/Stephenson-Software/trace#usage-reporting"), on);
+        assertTrue(on.endsWith("Details: https://danielstephenson.dev/usage-reporting"), on);
     }
 
     @Test
