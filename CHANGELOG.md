@@ -9,6 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - The usage-reporting "Details" link (startup notice, `config.yml` and the docs) now points at https://danielstephenson.dev/usage-reporting, a public page; the previous link led to a private repository and returned 404 for everyone. The vendored trace client is now 0.6.1, which carries the same link in the `plugins/trace/config.yml` header it writes. Details: https://github.com/Stephenson-Software/trace-client-java/releases/tag/0.6.1.
+
+## [3.1.0] – 2026-10-06
+
+### Added
+
+- The supported Minecraft versions are now declared in [`minecraft-versions.json`](minecraft-versions.json) — 1.19.4, 1.21.11, 26.2 and 26.3 — and listed in the README. Every stable release is booted on a real server of each version before it is published, and every build checks that the plugin only uses Bukkit API that exists on all of them (see [#125](https://github.com/Dans-Plugins/AlternateAccountFinder/pull/125) and [#132](https://github.com/Dans-Plugins/AlternateAccountFinder/pull/132)).
+- Every usage event now carries a random server ID as the tag `install`, so the trace server can count servers rather than raw events. The first time reporting runs, the ID is appended to `plugins/trace/config.yml` as a `server-id:` line under a comment explaining it; deleting the line gets a new one. It identifies no person, account or IP address, and no ID is created or written while reporting is off. The startup notice, the `config.yml` comment and the docs now mention it. The vendored trace client is 0.5.0 (see [#130](https://github.com/Dans-Plugins/AlternateAccountFinder/pull/130) and [#131](https://github.com/Dans-Plugins/AlternateAccountFinder/pull/131)).
+
+### Changed
+
 - The vendored trace client is now 0.4.0. `plugins/trace/config.yml` can now carry a `tags:` block whose entries are added to every usage event reported by the plugins on that server, with an event's own tag winning on a key clash; release test servers write `ci: "true"` there so their boots are left out of real-installation figures. A server without a `tags:` block reports exactly as before. The `tags:` block arrived in trace-client 0.3.0; details: https://github.com/Stephenson-Software/trace-client-java/releases/tag/0.3.0.
 - Every usage event now carries the plugin version. Previously only the `startup` event did; a `command` event now reports the plugin version alongside the command name. Nothing else about what is sent has changed — still nothing about players, addresses or the server (see [#127](https://github.com/Dans-Plugins/AlternateAccountFinder/pull/127)).
 
