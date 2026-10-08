@@ -43,7 +43,7 @@ If the key file is missing when the server starts, the plugin does not stop — 
 
 There is no way to recover the old addresses without the original key file. The startup migration will not touch those rows: an address it can neither decrypt nor read as a plaintext IP is left exactly as stored and reported in the log by account UUID, so restoring the original key file later still recovers them.
 
-If the key file exists but is not exactly 32 bytes, the plugin treats it as corrupted and disables itself rather than quietly generating a replacement — the console shows one message saying the key could not be loaded and that the file should be restored, and the server keeps running without the plugin. Restore the file from a backup instead of deleting it.
+If the key file exists but is not exactly 32 bytes, the plugin treats it as corrupted and disables itself rather than quietly generating a replacement, and the server keeps running without the plugin. The console shows three error lines: one giving the expected and actual size of the file, one reading `*** ALL EXISTING ENCRYPTED DATA WILL BE UNRECOVERABLE ***`, and a final one saying the key could not be loaded and that the file should be restored from a backup rather than deleted, followed by a stack trace. The second line describes what would happen if the key were replaced, not something that has already happened — the plugin stops before reading or rewriting any stored address, and restoring the original file recovers everything. Restore the file from a backup instead of deleting it.
 
 ## Common Scenarios
 
@@ -61,7 +61,7 @@ Example:
 /aaf accounts 192.168.1.1
 ```
 
-The plugin will list every player name that has connected from that IP, along with each account's login count and first/last login timestamps. The account that logged in from that IP most recently is listed first. Banned players are highlighted in red. An account the server has no cached name for — for example one that has not connected since the server's player cache was cleared — is listed by its UUID instead.
+The plugin will list every player name that has connected from that IP, along with each account's login count and first/last login timestamps. The timestamps are in UTC, not the server's local time, so convert them before comparing against your own logs or a player's account of when they joined. The account that logged in from that IP most recently is listed first. Banned players are highlighted in red. An account the server has no cached name for — for example one that has not connected since the server's player cache was cleared — is listed by its UUID instead.
 
 ### Finding suspected alternate accounts for a player
 

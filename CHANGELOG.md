@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - The usage-reporting "Details" link (startup notice, `config.yml` and the docs) now points at https://danielstephenson.dev/usage-reporting, a public page; the previous link led to a private repository and returned 404 for everyone. The vendored trace client is now 0.6.1, which carries the same link in the `plugins/trace/config.yml` header it writes. Details: https://github.com/Stephenson-Software/trace-client-java/releases/tag/0.6.1.
 
+### Fixed
+
+- The [Commands Reference](COMMANDS.md) and [User Guide](USER_GUIDE.md) now say that the first/last login timestamps `/aaf accounts` shows are in UTC rather than the server's local time, which they have been since login records were first stored in the database. The Commands Reference also gives the replies `/aaf`, `/aaf accounts` and `/aaf alts` send when there is nothing to list or the argument cannot be used, and the User Guide now describes the three console lines a corrupted `ip-encryption.key` produces instead of saying there is one, including that the `ALL EXISTING ENCRYPTED DATA WILL BE UNRECOVERABLE` line describes what a replacement key would do rather than damage already done. The behaviour itself is unchanged.
+
 ## [3.1.0] – 2026-10-06
 
 ### Added
