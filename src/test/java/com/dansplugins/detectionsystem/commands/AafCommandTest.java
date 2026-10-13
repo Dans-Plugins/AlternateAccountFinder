@@ -19,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>No mock framework is configured in this project, so the {@link CommandSender} these tests
  * pass in is a {@link Proxy} over the Bukkit interface that records {@code sendMessage} calls and
  * answers {@code hasPermission} from a fixed verdict. That is enough to cover routing and the
- * usage messages, because {@link AafCommand} and the argument-count branches of the two
- * sub-commands touch nothing else.
+ * usage messages, because {@link AafCommand}, the argument-count branches of the two
+ * sub-commands and the IP-literal check of the accounts command touch nothing else.
  *
  * <p>What remains uncovered, deliberately: every branch that reaches {@code plugin.getServer()} —
  * the accounts and alts lookups themselves, and the online-player suggestions of the alts
@@ -92,6 +92,32 @@ class AafCommandTest {
         assertTrue(command.onCommand(sender.asCommandSender(), null, "aaf", new String[]{"accounts"}));
 
         assertEquals(List.of(ChatColor.RED + "You do not have permission to use this command."), sender.messages);
+    }
+
+    @Test
+    void accountsRejectsAHostnameBeforeLookingAnythingUp() {
+        // A hostname must be refused before the asynchronous task is scheduled, so no DNS query
+        // leaves the server (issue #139). The plugin reference is null, so reaching the scheduler
+        // would throw instead of replying.
+        RecordingSender sender = new RecordingSender(true);
+
+        assertTrue(command.onCommand(sender.asCommandSender(), null, "aaf", new String[]{"accounts", "example.com"}));
+
+        assertEquals(List.of(ChatColor.RED + "Invalid IP address."), sender.messages);
+    }
+
+    @Test
+    void accountsRejectsArgumentsThatAreNotIpLiterals() {
+        List<String> arguments = List.of("localhost", "256.1.1.1", "1.2.3", "not-an-ip", "::1::");
+
+        for (String argument : arguments) {
+            RecordingSender sender = new RecordingSender(true);
+
+            assertTrue(command.onCommand(sender.asCommandSender(), null, "aaf", new String[]{"accounts", argument}));
+
+            assertEquals(List.of(ChatColor.RED + "Invalid IP address."), sender.messages,
+                    "unexpected reply for /aaf accounts " + argument);
+        }
     }
 
     @Test

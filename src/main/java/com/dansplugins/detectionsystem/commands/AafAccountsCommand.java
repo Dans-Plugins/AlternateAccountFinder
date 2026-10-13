@@ -4,6 +4,7 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static net.md_5.bungee.api.ChatColor.*;
 
 import com.dansplugins.detectionsystem.AlternateAccountFinder;
+import com.dansplugins.detectionsystem.encryption.StoredAddressClassifier;
 import com.dansplugins.detectionsystem.logins.AccountInfo;
 import com.dansplugins.detectionsystem.logins.AddressAccountInfo;
 import com.dansplugins.detectionsystem.logins.LoginService;
@@ -39,6 +40,13 @@ public final class AafAccountsCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0) {
             sender.sendMessage(RED + "Usage: /aaf accounts <ip>");
+            return true;
+        }
+
+        // InetAddress.getByName resolves anything that is not an IP literal through DNS, so a
+        // hostname would otherwise be looked up from the game server (issue #139).
+        if (!StoredAddressClassifier.isIpLiteral(args[0])) {
+            sender.sendMessage(RED + "Invalid IP address.");
             return true;
         }
 
