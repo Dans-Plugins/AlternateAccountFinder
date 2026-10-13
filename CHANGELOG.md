@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- `/aaf accounts <ip>` now accepts only an IP address. Previously a hostname such as `example.com` was resolved through DNS from the game server and the accounts for whatever address it resolved to were listed; it now gets `Invalid IP address.`, as do shortened IPv4 forms such as `1.2.3` (see [#139](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/139)).
 - The [Commands Reference](COMMANDS.md) and [User Guide](USER_GUIDE.md) now say that the first/last login timestamps `/aaf accounts` shows are in UTC rather than the server's local time, which they have been since login records were first stored in the database. The Commands Reference also gives the replies `/aaf`, `/aaf accounts` and `/aaf alts` send when there is nothing to list or the argument cannot be used, and the User Guide now describes the three console lines a corrupted `ip-encryption.key` produces instead of saying there is one, including that the `ALL EXISTING ENCRYPTED DATA WILL BE UNRECOVERABLE` line describes what a replacement key would do rather than damage already done. The behaviour itself is unchanged.
 
 ## [3.1.0] – 2026-10-06
