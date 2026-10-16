@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import static com.dansplugins.detectionsystem.jooq.Tables.AAF_LOGIN_RECORD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LoginRepositoryTest {
@@ -115,6 +116,86 @@ class LoginRepositoryTest {
     @Test
     void loginCountIsZeroWhenNoRecordExists() throws UnknownHostException {
         assertEquals(0, repository.getLoginCount(UUID.randomUUID(), address("10.0.0.9")));
+    }
+
+    @Test
+    void loginCountIsScopedToTheAccount() throws UnknownHostException {
+        // The join listener only notifies on an account's first login from an address, so another
+        // account's logins from that address must not count towards it.
+        UUID player = UUID.randomUUID();
+        UUID other = UUID.randomUUID();
+        InetAddress ip = address("10.0.0.7");
+
+        repository.saveLogin(player, ip);
+        repository.saveLogin(player, ip);
+
+        assertEquals(0, repository.getLoginCount(other, ip));
+        repository.saveLogin(other, ip);
+        assertEquals(1, repository.getLoginCount(other, ip));
+        assertEquals(2, repository.getLoginCount(player, ip));
+    }
+
+    @Test
+    void repeatedLoginKeepsTheFirstLoginAndAdvancesTheLastLogin() throws UnknownHostException {
+        // The earlier record is dated well in the past so that the upsert's timestamps are
+        // distinguishable from it, rather than landing within the same instant.
+        UUID player = UUID.randomUUID();
+        InetAddress ip = address("10.0.0.8");
+        LocalDateTime earlier = LocalDateTime.of(2020, 1, 1, 0, 0);
+
+        saveLoginAt(player, ip, earlier);
+        repository.saveLogin(player, ip);
+
+        AccountInfo info = repository.getAddressInfo(ip).getAccountInfo(player);
+        assertEquals(2, info.getLogins());
+        assertEquals(earlier, info.getFirstLogin());
+        assertTrue(info.getLastLogin().isAfter(earlier),
+                "last login should move forward on a repeated login, but was " + info.getLastLogin());
+    }
+
+    @Test
+    void addressWithNoLoginsHasNoAccounts() throws UnknownHostException {
+        InetAddress ip = address("10.0.0.10");
+        repository.saveLogin(UUID.randomUUID(), address("10.0.0.11"));
+
+        AddressAccountInfo info = repository.getAddressInfo(ip);
+
+        assertEquals(ip, info.getIP());
+        assertEquals(List.of(), info.getAccounts());
+        assertNull(info.getAccountInfo(UUID.randomUUID()));
+    }
+
+    @Test
+    void ipv6AddressIsFoundWhicheverFormItIsWrittenIn() throws UnknownHostException {
+        // /aaf accounts accepts any spelling of an IPv6 literal. The lookup matches ciphertext, so
+        // it only finds the record because InetAddress#getHostAddress renders every spelling of
+        // the same address identically before it is encrypted.
+        UUID player = UUID.randomUUID();
+        repository.saveLogin(player, address("2001:db8:0:0:0:0:0:1"));
+
+        for (String spelling : List.of("2001:db8::1", "2001:DB8::1", "2001:0db8:0000:0000:0000:0000:0000:0001")) {
+            assertEquals(List.of(player), repository.getAddressInfo(address(spelling)).getAccounts(),
+                    "no account found for " + spelling);
+        }
+    }
+
+    @Test
+    void ipv4MappedIpv6AddressMatchesTheIpv4Record() throws UnknownHostException {
+        // InetAddress parses an IPv4-mapped IPv6 literal to the plain IPv4 address, so both
+        // spellings resolve to the same stored record.
+        UUID player = UUID.randomUUID();
+        repository.saveLogin(player, address("192.0.2.20"));
+
+        assertEquals(List.of(player), repository.getAddressInfo(address("::ffff:192.0.2.20")).getAccounts());
+    }
+
+    @Test
+    void accountWithNoRecordedLoginsHasNoPotentialAlts() throws UnknownHostException {
+        // /aaf alts resolves any name to an account, including one the plugin has never recorded.
+        repository.saveLogin(UUID.randomUUID(), address("192.0.2.21"));
+        repository.saveLogin(UUID.randomUUID(), address("192.0.2.21"));
+
+        assertEquals(List.of(), repository.getPotentialAlts(UUID.randomUUID()));
     }
 
     @Test
