@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [3.2.1] – 2026-10-18
+
+Nothing operator-visible changed in this release: commands, configuration, permissions and stored login data behave exactly as in 3.2.0. It adds automated tests that pin the plugin's existing login-lookup behaviour (see [#145](https://github.com/Dans-Plugins/AlternateAccountFinder/pull/145)).
+
 ## [3.2.0] – 2026-10-15
 
 ### Changed
