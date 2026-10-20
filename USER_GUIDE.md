@@ -63,6 +63,8 @@ Example:
 
 The plugin will list every player name that has connected from that IP, along with each account's login count and first/last login timestamps. The timestamps are in UTC, not the server's local time, so convert them before comparing against your own logs or a player's account of when they joined. The account that logged in from that IP most recently is listed first. Banned players are highlighted in red. An account the server has no cached name for — for example one that has not connected since the server's player cache was cleared — is listed by its UUID instead.
 
+An IPv6 address can be typed in any form, compressed or not. The reply repeats it written out in full, so `/aaf accounts 2001:db8::1` answers under `Accounts for 2001:db8:0:0:0:0:0:1:`. An IPv4-mapped address such as `::ffff:192.168.1.1` is treated as the IPv4 address it maps to.
+
 ### Finding suspected alternate accounts for a player
 
 Use this to get a list of players who share at least one IP address with the target player:
