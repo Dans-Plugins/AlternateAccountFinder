@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - The [Commands Reference](COMMANDS.md) and [User Guide](USER_GUIDE.md) now say how `/aaf accounts <ip>` treats different spellings of one address: every spelling of an IPv6 address finds the same accounts, an IPv4-mapped IPv6 address finds the accounts of the IPv4 address it maps to, and the reply names the address in that single form (IPv6 written out in full, for example `2001:db8:0:0:0:0:0:1`) rather than as it was typed. The behaviour itself is unchanged.
+- The [Configuration Guide](CONFIG.md#files-in-the-data-folder) no longer says the plugin's data folder holds only two files besides `config.yml`. With the default `database.url` the embedded H2 database, `aaf.mv.db`, is kept there too, and it is the database backup `ip-encryption.key` has to be kept with. The behaviour itself is unchanged.
 
 ## [3.2.1] – 2026-10-18
 
