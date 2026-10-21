@@ -2,7 +2,7 @@
 
 All options are set in `plugins/AlternateAccountFinder/config.yml`. The file is created automatically on first run.
 
-The plugin also writes two non-configuration files into the same folder — see [Files in the data folder](#files-in-the-data-folder) at the end of this guide.
+The plugin also writes two non-configuration files into the same folder, and with the default `database.url` the database itself lives there too — see [Files in the data folder](#files-in-the-data-folder) at the end of this guide.
 
 ---
 
@@ -146,7 +146,9 @@ too.
 
 ## Files in the data folder
 
-`plugins/AlternateAccountFinder/` holds two files besides `config.yml`. Neither is configuration, and neither should be edited by hand.
+`plugins/AlternateAccountFinder/` holds two files of the plugin's own besides `config.yml`, listed below. Neither is configuration, and neither should be edited by hand.
+
+With the default [`database.url`](#databaseurl), the embedded H2 database is kept in the same folder as `aaf.mv.db`, written by H2 rather than by the plugin. That file holds every login record, so it is the database backup the key file has to be kept with. The default URL is relative to the directory the server is started from, so the file lands in this folder when the server is started from its own root directory, as it normally is. With a `jdbc:mariadb://` URL nothing database-related is written here.
 
 | File | Created | Purpose |
 |------|---------|---------|
