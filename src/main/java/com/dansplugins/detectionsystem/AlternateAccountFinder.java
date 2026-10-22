@@ -176,7 +176,7 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
 
         // usage reporting: one event now, one per command; see config.yml
         trace = buildTraceClient(getConfig(), getName(), getDescription().getVersion(), getLogger(), getDataFolder().getParentFile());
-        getLogger().info(usageReportingNotice(getName(), trace.disabledReason()));
+        getLogger().info(usageReportingNotice(getName(), usageReportingEndpoint(getConfig()), trace.disabledReason()));
         trace.report("startup");
     }
 
@@ -300,14 +300,23 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
      * is missing, and honoured if an operator sets it to {@code false}. {@code null} skips it.
      */
     static TraceClient buildTraceClient(ConfigurationSection config, String application, String version, Logger logger, File pluginsDirectory) {
-        String endpoint = config.getString("usage-reporting.endpoint");
         String key = config.getString("usage-reporting.key");
-        return TraceClient.builder(endpoint != null ? endpoint : "https://trace.danielstephenson.dev", application, version)
+        return TraceClient.builder(usageReportingEndpoint(config), application, version)
                 .key(key != null ? key : "")
                 .enabled(config.getBoolean("usage-reporting.enabled"))
                 .serverWideConfig(pluginsDirectory)
                 .logger(logger)
                 .build();
+    }
+
+    /**
+     * The trace server usage events go to: {@code usage-reporting.endpoint}, or the author's
+     * server if no config carries it. Shared by {@link #buildTraceClient} and the startup notice
+     * so the notice names the server the events are actually sent to (#153).
+     */
+    static String usageReportingEndpoint(ConfigurationSection config) {
+        String endpoint = config.getString("usage-reporting.endpoint");
+        return endpoint != null ? endpoint : "https://trace.danielstephenson.dev";
     }
 
     /**
@@ -338,14 +347,15 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
      * and how to turn it off.
      *
      * @param pluginName     the name this plugin reports as
+     * @param endpoint       {@link #usageReportingEndpoint}: the server the events are sent to
      * @param disabledReason {@link TraceClient#disabledReason()}: {@code null} when reporting is on
      */
-    static String usageReportingNotice(String pluginName, String disabledReason) {
+    static String usageReportingNotice(String pluginName, String endpoint, String disabledReason) {
         if (disabledReason != null) {
             return "Usage reporting is off (" + disabledReason + ").";
         }
         return "Usage reporting is on: " + pluginName + " sends its name, version and command names to "
-                + "https://trace.danielstephenson.dev, plus a random server ID (server-id in plugins/trace/config.yml) - nothing about players. "
+                + endpoint + ", plus a random server ID (server-id in plugins/trace/config.yml) - nothing about players. "
                 + "Turn it off with usage-reporting.enabled: false in this plugin's config.yml, "
                 + "or for every plugin with enabled: false in plugins/trace/config.yml. "
                 + "Details: https://danielstephenson.dev/usage-reporting";

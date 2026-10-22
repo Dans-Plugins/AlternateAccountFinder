@@ -356,8 +356,33 @@ class AlternateAccountFinderTest {
     }
 
     @Test
+    void theStartupNoticeNamesTheConfiguredEndpoint() {
+        // An operator who points usage-reporting.endpoint elsewhere must be told the events go
+        // there, not to the author's server (#153).
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.set("usage-reporting.endpoint", "https://trace.example.org");
+        onDisk.setDefaults(bundledConfig());
+
+        String endpoint = AlternateAccountFinder.usageReportingEndpoint(onDisk);
+        String on = AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", endpoint, null);
+
+        assertEquals("https://trace.example.org", endpoint);
+        assertTrue(on.startsWith("Usage reporting is on: AlternateAccountFinder sends its name, version and command names to https://trace.example.org, "), on);
+        assertFalse(on.contains("trace.danielstephenson.dev"), on);
+    }
+
+    @Test
+    void theEndpointFallsBackToTheBundledDefaultThenTheAuthorsServer() {
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.setDefaults(bundledConfig());
+
+        assertEquals(bundledConfig().getString("usage-reporting.endpoint"), AlternateAccountFinder.usageReportingEndpoint(onDisk));
+        assertEquals("https://trace.danielstephenson.dev", AlternateAccountFinder.usageReportingEndpoint(new YamlConfiguration()));
+    }
+
+    @Test
     void theStartupNoticeSaysWhatIsSentAndWhereToTurnItOff() {
-        String on = AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", null);
+        String on = AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", "https://trace.danielstephenson.dev", null);
 
         assertTrue(on.startsWith("Usage reporting is on: AlternateAccountFinder sends its name, version and command names to https://trace.danielstephenson.dev"), on);
         assertTrue(on.contains(", plus a random server ID (server-id in plugins/trace/config.yml) - nothing about players."), on);
@@ -369,9 +394,9 @@ class AlternateAccountFinderTest {
     @Test
     void theStartupNoticeSaysWhyReportingIsOff() {
         assertEquals("Usage reporting is off (config.yml).",
-                AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", TraceClient.REASON_CONFIG));
+                AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", "https://trace.danielstephenson.dev", TraceClient.REASON_CONFIG));
         assertEquals("Usage reporting is off (server-wide config: plugins/trace/config.yml).",
-                AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", TraceClient.REASON_SERVER_WIDE));
+                AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", "https://trace.danielstephenson.dev", TraceClient.REASON_SERVER_WIDE));
     }
 
     /**
