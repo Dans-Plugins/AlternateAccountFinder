@@ -14,9 +14,9 @@ notify-users:
 # line in plugins/trace/config.yml) so servers can be counted; it identifies
 # no person, account or IP address. Nothing about players is included.
 # Repeats of a command within a minute are sent as one event carrying how
-# many there were. Sending happens off the main thread, never blocks a tick, and is dropped
-# silently if the server cannot be reached. Set enabled to false to turn it
-# off.
+# many there were. Sending happens off the main thread, never blocks a
+# tick, and is dropped silently if the server cannot be reached. Set enabled
+# to false to turn it off.
 #
 # To turn it off for every plugin on this server at once, set enabled: false
 # in plugins/trace/config.yml (created on first start and never turned back
