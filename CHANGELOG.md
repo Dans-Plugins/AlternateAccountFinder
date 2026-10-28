@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Repeated usage events are now counted rather than each sent. The first use of a command is still sent at once, but further identical `command` events within the next 60 seconds are sent as one event when that minute ends, carrying a `coalesced` tag with how many there were; whatever is still being counted when the plugin is disabled is sent then. The `startup` event is never held back. Nothing new about players, addresses or the server is sent. The vendored trace client is now 0.7.0 (see [#161](https://github.com/Dans-Plugins/AlternateAccountFinder/pull/161)). Details: https://github.com/Stephenson-Software/trace-client-java/releases/tag/0.7.0.
+
 ### Fixed
 
 - The startup line announcing that usage reporting is on now names the server set in `usage-reporting.endpoint`. Previously it always named `https://trace.danielstephenson.dev`, even when the endpoint had been changed and events were going elsewhere (see [#153](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/153)).
