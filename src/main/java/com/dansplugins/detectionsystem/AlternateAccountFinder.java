@@ -22,6 +22,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.flywaydb.core.Flyway;
@@ -159,13 +160,16 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         // Listeners
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
-        // Commands. Each use is reported before the command runs; see config.yml. The executor
+        // Commands. Each use by a player is reported before the command runs; see config.yml. The executor
         // is no longer the AafCommand itself, so Bukkit's fallback of asking the executor for
         // completions no longer applies and the completer has to be set explicitly.
         AafCommand aafCommand = new AafCommand(this);
         PluginCommand aaf = getCommand("aaf");
         aaf.setExecutor((sender, command, label, args) -> {
-            trace.report("command", null, Collections.singletonMap("name", command.getName()));
+            // console, command-block and plugin-dispatched commands are not counted
+            if (sender instanceof Player) {
+                trace.report("command", null, Collections.singletonMap("name", command.getName()));
+            }
             return aafCommand.onCommand(sender, command, label, args);
         });
         aaf.setTabCompleter(aafCommand);
