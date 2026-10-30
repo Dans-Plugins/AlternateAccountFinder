@@ -129,8 +129,8 @@ usage-reporting:
 
 When the plugin is enabled, and each time a player uses one of its commands, a small event is sent to the
 author's [trace](https://github.com/Stephenson-Software/trace-client-java) server so it is known which
-plugins are actually in use. Commands run from the console, by a command block or by another plugin
-are not reported. An event carries the plugin's name, the event name (`startup` or
+plugins are actually in use. Commands run from the console or a command block are not reported, and
+neither is one another plugin runs other than as a player. An event carries the plugin's name, the event name (`startup` or
 `command`), the plugin version, and for a command the command name, plus a random server ID (the
 `server-id` line in `plugins/trace/config.yml`, which identifies no person, account or IP address;
 deleting the line gets a new one) — nothing about players, addresses, or the world. Repeats are

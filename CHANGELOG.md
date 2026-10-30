@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- The [README](README.md#usage-reporting) and [Configuration Guide](CONFIG.md#usage-reporting) no longer say every use of a command is reported. Since 3.5.0 only a command a player runs is; console, command-block and plugin-dispatched commands are not. The behaviour itself is unchanged.
+- The [README](README.md#usage-reporting) and [Configuration Guide](CONFIG.md#usage-reporting) no longer say every use of a command is reported. Since 3.5.0 only a command sent by a player is; one run from the console or a command block, or by another plugin other than as a player, is not. The behaviour itself is unchanged.
 
 ## [3.5.0] – 2026-10-30
 
