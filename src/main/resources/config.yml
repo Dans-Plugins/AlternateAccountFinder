@@ -7,10 +7,12 @@ notify-users:
   - 0a9fa342-3139-49d7-8acb-fcf4d9c1f0ef
   - 3fcad669-b828-4d6d-be88-1c28b067c5d8
 
-# Usage reporting. When the plugin is enabled, and each time one of its
-# commands is used, a small event (plugin name, event name, plugin version)
-# is sent to the author's trace server so it is known which plugins are
-# actually in use. Each event also carries a random server ID (the server-id
+# Usage reporting. When the plugin is enabled, and each time a player uses
+# one of its commands, a small event (plugin name, event name, plugin
+# version) is sent to the author's trace server so it is known which plugins
+# are actually in use. Commands run from the console or a command block are
+# not reported, and neither is one another plugin runs other than as a
+# player. Each event also carries a random server ID (the server-id
 # line in plugins/trace/config.yml) so servers can be counted; it identifies
 # no person, account or IP address. Nothing about players is included.
 # Repeats of a command within a minute are sent as one event carrying how
