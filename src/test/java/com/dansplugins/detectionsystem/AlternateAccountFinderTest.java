@@ -287,6 +287,42 @@ class AlternateAccountFinderTest {
     }
 
     @Test
+    void aKeyLeftWithNoValueFallsBackToTheBundledKeySoReportingStaysOn() throws Exception {
+        // CONFIG.md and config.yml say an empty key turns reporting off. That holds for key: ""
+        // (above) but not for key: with nothing after it: YAML reads that as null, Bukkit drops the
+        // entry, and the one-argument getter falls through to the jar's key.
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.loadFromString("usage-reporting:\n  key:\n");
+        onDisk.setDefaults(bundledConfig());
+
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
+
+        assertTrue(trace.isEnabled());
+        trace.close();
+    }
+
+    @Test
+    void aDialectLeftWithNoValueFallsBackToTheBundledDefaultRatherThanStoppingStartup() throws Exception {
+        // parseDialect rejects a blank value, but only dialect: "" reaches it as one. CONFIG.md
+        // says so; dialect: with nothing after it behaves as a deleted key.
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.loadFromString("database:\n  dialect:\n");
+        onDisk.setDefaults(bundledConfig());
+
+        assertEquals(SQLDialect.H2, AlternateAccountFinder.parseDialect(onDisk.getString("database.dialect")));
+    }
+
+    @Test
+    void aDialectSetToAnEmptyStringIsRejected() throws Exception {
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.loadFromString("database:\n  dialect: ''\n");
+        onDisk.setDefaults(bundledConfig());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> AlternateAccountFinder.parseDialect(onDisk.getString("database.dialect")));
+    }
+
+    @Test
     void staysOffWhenNoConfigCarriesTheBlockAtAll() {
         // Only reachable if the bundled config.yml itself has lost the block; the fallbacks are
         // then the author's endpoint and an empty key, and an empty key means off.
