@@ -32,7 +32,7 @@ database:
 
 **Type:** string  
 **Default:** `H2`  
-**Description:** The SQL dialect that jOOQ uses when generating queries. Set to `H2` for the embedded database or `MARIADB` for MariaDB/MySQL. Case does not matter, so `h2` and `mariadb` work too. If the key is set to an empty value, or to something that is not a dialect the plugin can use, startup stops with a message naming the key and the accepted values, and the plugin disables itself rather than running against the wrong dialect. Removing the key entirely is not an error — a key absent from your file falls back to the default above.
+**Description:** The SQL dialect that jOOQ uses when generating queries. Set to `H2` for the embedded database or `MARIADB` for MariaDB/MySQL. Case does not matter, so `h2` and `mariadb` work too. If the key is set to an empty string (`dialect: ''`), or to something that is not a dialect the plugin can use, startup stops with a message naming the key and the accepted values, and the plugin disables itself rather than running against the wrong dialect. Removing the key entirely, or leaving it with no value (`dialect:` on a line of its own), is not an error — a key absent from your file falls back to the default above.
 
 **Example:**
 
@@ -121,7 +121,7 @@ usage-reporting:
 
 **Type:** string  
 **Default:** the plugin's key  
-**Description:** Identifies this plugin to the trace server so reports are attributed to it. Not a secret: it ships in the default `config.yml` and can only report as AlternateAccountFinder. Empty means reporting is off regardless of `usage-reporting.enabled`.
+**Description:** Identifies this plugin to the trace server so reports are attributed to it. Not a secret: it ships in the default `config.yml` and can only report as AlternateAccountFinder. An empty string, `key: ''`, means reporting is off regardless of `usage-reporting.enabled`. Deleting the key, or leaving it with no value (`key:` on a line of its own), does not turn reporting off: a key absent from your file falls back to the default above, so the plugin's key is used and reporting stays on.
 
 ---
 

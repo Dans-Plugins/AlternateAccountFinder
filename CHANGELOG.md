@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- The [Configuration Guide](CONFIG.md#usage-reportingkey) and the comment in the bundled `config.yml` no longer suggest that any empty `usage-reporting.key` turns reporting off. Only an empty string, `key: ''`, does; deleting the key, or leaving `key:` with no value, makes the plugin fall back to its bundled key, so reporting stays on. The Configuration Guide draws the same line for [`database.dialect`](CONFIG.md#databasedialect): `dialect: ''` stops startup, but `dialect:` with no value falls back to `H2`. The `config.yml` comment also now says a `command` event carries the command's name, as the other documents already did. No key or default changed, and the behaviour itself is unchanged.
+
+## [3.5.1] – 2026-11-01
+
+### Fixed
+
 - The [README](README.md#usage-reporting) and [Configuration Guide](CONFIG.md#usage-reporting) no longer say every use of a command is reported. Since 3.5.0 only a command sent by a player is; one run from the console or a command block, or by another plugin other than as a player, is not. The behaviour itself is unchanged.
 - The usage-reporting comment in the bundled `config.yml` says the same: only a command sent by a player is reported. No key or default changed.
 
