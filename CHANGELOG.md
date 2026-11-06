@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Setting `usage-reporting.endpoint` to an empty string, `endpoint: ''`, no longer makes an exception escape plugin startup. Reporting is now simply off, and the startup line says so; the [Configuration Guide](CONFIG.md#usage-reportingendpoint) documents this. Deleting the key, or leaving `endpoint:` with no value, still falls back to the bundled endpoint (see [#177](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/177)).
+
+## [3.5.2] – 2026-11-05
+
+### Fixed
+
 - The [Configuration Guide](CONFIG.md#usage-reportingkey) and the comment in the bundled `config.yml` no longer suggest that any empty `usage-reporting.key` turns reporting off. Only an empty string, `key: ''`, does; deleting the key, or leaving `key:` with no value, makes the plugin fall back to its bundled key, so reporting stays on. The Configuration Guide draws the same line for [`database.dialect`](CONFIG.md#databasedialect): `dialect: ''` stops startup, but `dialect:` with no value falls back to `H2`. The `config.yml` comment also now says a `command` event carries the command's name, as the other documents already did. No key or default changed, and the behaviour itself is unchanged.
 
 ## [3.5.1] – 2026-11-01
