@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- Setting `usage-reporting.endpoint` to an empty string, `endpoint: ''`, no longer makes an exception escape plugin startup. Reporting is now simply off, and the startup line says so; the [Configuration Guide](CONFIG.md#usage-reportingendpoint) documents this. Previously Paper disabled the plugin, while Spigot logged a stack trace and left out the startup line. Deleting the key, or leaving `endpoint:` with no value, still falls back to the bundled endpoint (see [#177](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/177)).
+- Setting `usage-reporting.endpoint` to an empty string, `endpoint: ''`, no longer makes an exception escape plugin startup. Reporting is now simply off, and the startup line says so; the [Configuration Guide](CONFIG.md#usage-reportingendpoint) documents this. Deleting the key, or leaving `endpoint:` with no value, still falls back to the bundled endpoint (see [#177](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/177)).
 
 ## [3.5.2] – 2026-11-05
 
