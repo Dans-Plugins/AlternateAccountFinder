@@ -299,13 +299,23 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
      * which the client treats as "off" -- both only reachable if the bundled {@code config.yml}
      * itself has lost the block.
      *
+     * <p>An endpoint an operator has blanked means reporting is off, reported as
+     * {@link TraceClient#REASON_CONFIG}. {@code TraceClient.builder} throws on a blank URL, and the
+     * call in {@code onEnable} is outside any {@code try} (#177). The check is the client's own,
+     * {@code trim().isEmpty()}, so nothing it would reject gets past this one. Falling back to the
+     * author's server instead would send events after an operator had tried to stop them.
+     *
      * <p>{@code pluginsDirectory} is the server's {@code plugins/} folder, where the client keeps the
      * server-wide switch {@code plugins/trace/config.yml}: created with {@code enabled: true} if it
      * is missing, and honoured if an operator sets it to {@code false}. {@code null} skips it.
      */
     static TraceClient buildTraceClient(ConfigurationSection config, String application, String version, Logger logger, File pluginsDirectory) {
+        String endpoint = usageReportingEndpoint(config);
+        if (endpoint.trim().isEmpty()) {
+            return TraceClient.disabled();
+        }
         String key = config.getString("usage-reporting.key");
-        return TraceClient.builder(usageReportingEndpoint(config), application, version)
+        return TraceClient.builder(endpoint, application, version)
                 .key(key != null ? key : "")
                 .enabled(config.getBoolean("usage-reporting.enabled"))
                 .serverWideConfig(pluginsDirectory)

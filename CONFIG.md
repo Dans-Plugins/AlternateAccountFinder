@@ -113,7 +113,7 @@ usage-reporting:
 
 **Type:** string  
 **Default:** `https://trace.danielstephenson.dev`  
-**Description:** The trace server events are sent to.
+**Description:** The trace server events are sent to. An empty string, `endpoint: ''`, means reporting is off regardless of `usage-reporting.enabled`, and the startup line says `Usage reporting is off (config.yml).` Deleting the key, or leaving it with no value (`endpoint:` on a line of its own), does not turn reporting off: a key absent from your file falls back to the default above, so events go to that server.
 
 ---
 

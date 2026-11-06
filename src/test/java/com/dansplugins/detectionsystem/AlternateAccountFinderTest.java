@@ -417,6 +417,48 @@ class AlternateAccountFinderTest {
     }
 
     @Test
+    void anEmptyEndpointTurnsReportingOffRatherThanThrowingOutOfOnEnable() throws Exception {
+        // TraceClient.builder throws on a blank URL, and the call in onEnable is outside any try,
+        // so this used to end startup with a stack trace (#177). Falling back to the author's
+        // server instead would send events after an operator had tried to stop them.
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.loadFromString("usage-reporting:\n  endpoint: ''\n");
+        onDisk.setDefaults(bundledConfig());
+
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
+
+        assertFalse(trace.isEnabled());
+        assertEquals(TraceClient.REASON_CONFIG, trace.disabledReason());
+        assertEquals("Usage reporting is off (config.yml).", AlternateAccountFinder.usageReportingNotice(
+                "AlternateAccountFinder", AlternateAccountFinder.usageReportingEndpoint(onDisk), trace.disabledReason()));
+    }
+
+    @Test
+    void aWhitespaceEndpointTurnsReportingOffToo() throws Exception {
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.loadFromString("usage-reporting:\n  endpoint: '   '\n");
+        onDisk.setDefaults(bundledConfig());
+
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
+
+        assertFalse(trace.isEnabled());
+    }
+
+    @Test
+    void anEndpointLeftWithNoValueFallsBackToTheBundledEndpointSoReportingStaysOn() throws Exception {
+        // Only an empty string turns reporting off. endpoint: with nothing after it behaves as a
+        // deleted key, as key: and dialect: do, and CONFIG.md says so.
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.loadFromString("usage-reporting:\n  endpoint:\n");
+        onDisk.setDefaults(bundledConfig());
+
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
+
+        assertTrue(trace.isEnabled());
+        trace.close();
+    }
+
+    @Test
     void theStartupNoticeSaysWhatIsSentAndWhereToTurnItOff() {
         String on = AlternateAccountFinder.usageReportingNotice("AlternateAccountFinder", "https://trace.danielstephenson.dev", null);
 
