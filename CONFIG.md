@@ -113,7 +113,7 @@ usage-reporting:
 
 **Type:** string  
 **Default:** `https://trace.danielstephenson.dev`  
-**Description:** The trace server events are sent to. An empty string, `endpoint: ''`, means reporting is off regardless of `usage-reporting.enabled`, and the startup line says `Usage reporting is off (config.yml).` Deleting the key, or leaving it with no value (`endpoint:` on a line of its own), does not turn reporting off: a key absent from your file falls back to the default above, so events go to that server.
+**Description:** The trace server events are sent to. An empty string, `endpoint: ''`, or one holding only whitespace, means reporting is off regardless of `usage-reporting.enabled`, and the startup line says `Usage reporting is off (config.yml).` Deleting the key, or leaving it with no value (`endpoint:` on a line of its own), does not turn reporting off: a key absent from your file falls back to the default above, so events go to that server.
 
 ---
 
@@ -121,7 +121,7 @@ usage-reporting:
 
 **Type:** string  
 **Default:** the plugin's key  
-**Description:** Identifies this plugin to the trace server so reports are attributed to it. Not a secret: it ships in the default `config.yml` and can only report as AlternateAccountFinder. An empty string, `key: ''`, means reporting is off regardless of `usage-reporting.enabled`. Deleting the key, or leaving it with no value (`key:` on a line of its own), does not turn reporting off: a key absent from your file falls back to the default above, so the plugin's key is used and reporting stays on.
+**Description:** Identifies this plugin to the trace server so reports are attributed to it. Not a secret: it ships in the default `config.yml` and can only report as AlternateAccountFinder. An empty string, `key: ''`, or one holding only whitespace, means reporting is off regardless of `usage-reporting.enabled`. Deleting the key, or leaving it with no value (`key:` on a line of its own), does not turn reporting off: a key absent from your file falls back to the default above, so the plugin's key is used and reporting stays on.
 
 ---
 
