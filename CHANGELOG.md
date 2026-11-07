@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
-- Setting `usage-reporting.endpoint` to an empty string, `endpoint: ''`, no longer makes an exception escape plugin startup. Reporting is now simply off, and the startup line says so; the [Configuration Guide](CONFIG.md#usage-reportingendpoint) documents this. Deleting the key, or leaving `endpoint:` with no value, still falls back to the bundled endpoint (see [#177](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/177)).
+- The [Configuration Guide](CONFIG.md#usage-reportingendpoint) now says a whitespace-only `usage-reporting.endpoint` or [`usage-reporting.key`](CONFIG.md#usage-reportingkey) turns reporting off, as an empty string does. The behaviour itself is unchanged.
+
+## [3.6.0] – 2026-11-07
+
+### Fixed
+
+- Setting `usage-reporting.endpoint` to an empty string, `endpoint: ''`, or to one holding only whitespace, no longer makes an exception escape plugin startup. Reporting is now simply off, and the startup line says so; the [Configuration Guide](CONFIG.md#usage-reportingendpoint) documents this. Deleting the key, or leaving `endpoint:` with no value, still falls back to the bundled endpoint (see [#177](https://github.com/Dans-Plugins/AlternateAccountFinder/issues/177)).
 
 ## [3.5.2] – 2026-11-05
 
