@@ -34,7 +34,8 @@ usage-reporting:
   # attributed to AlternateAccountFinder and can be revoked as a group if they
   # are ever abused. It is not a secret -- it ships in this file on every
   # server that runs the plugin -- and it cannot do anything except report as
-  # this plugin. An empty string ('') means reporting is off regardless of the
-  # switch above. Deleting the key or leaving it with no value does not: the
-  # plugin then falls back to its bundled key and reporting stays on.
+  # this plugin. An empty string (''), or one holding only whitespace, means
+  # reporting is off regardless of the switch above. Deleting the key or
+  # leaving it with no value does not: the plugin then falls back to its
+  # bundled key and reporting stays on.
   key: "1l1DZ2blqwQQibQakphlYzopU7X-JOx8XBtIE5ucHDY"
