@@ -81,7 +81,7 @@ database:
 
 Notification delivery depends on which optional plugins are installed:
 
-- If the **Mailboxes** plugin is present, notifications are delivered as mailbox messages.
+- If the **Mailboxes** plugin is present, notifications are delivered as mailbox messages from `AlternateAccountFinder`, with the title and text joined into one line.
 - Otherwise, if the **RPKit** notification library is present, notifications go through the RPKit notification system.
 - If neither is installed, notifications fall back to a plain in-game chat message sent to the recipient if they are online.
 
