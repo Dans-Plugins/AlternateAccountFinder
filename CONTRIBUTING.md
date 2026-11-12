@@ -154,7 +154,7 @@ For manual testing, build and run a local Spigot server with the plugin installe
 Docker Compose:
 
 ```
-docker compose up
+docker compose up --build
 ```
 
 or with Docker directly:
@@ -163,6 +163,10 @@ or with Docker directly:
 docker build -t aaf-test-server .
 docker run -p 25565:25565 aaf-test-server
 ```
+
+The server is Spigot 1.20.4, which is not one of the supported versions, and it keeps no data
+once its container is removed. Rebuild after every change, or the server keeps running the
+plugin from the last build. The [README](README.md#test-server) gives the details.
 
 ## Questions
 
