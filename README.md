@@ -83,20 +83,26 @@ Windows:
 
 A `Dockerfile` and a `compose.yml` are available to build and run a Spigot test server with the plugin installed.
 
+The server is Spigot **1.20.4** on Java 17, built with BuildTools when the image is built. That version is not one of the [supported versions](#supported-minecraft-versions), so this server does not reproduce the setup releases are tested on. Building the image also builds the plugin from the working tree with `./gradlew build`, which runs the unit tests, so a failing test stops the image build.
+
 #### Setup with Docker Compose
 
-1. Build and start the test server: `docker compose up`
+1. Build and start the test server: `docker compose up --build`
 
-The compose file builds the image from the `Dockerfile` in this repository and publishes port 25565.
+The compose file builds the image from the `Dockerfile` in this repository and publishes port 25565. Without `--build`, `docker compose up` builds the image only when it does not exist yet; after that it keeps starting the existing image, which contains the plugin as it was when that image was built.
 
 #### Setup with Docker
 
 1. Build the test server image: `docker build -t aaf-test-server .`
 2. Run the test server: `docker run -p 25565:25565 aaf-test-server`
 
+Run the build step again after changing the plugin; the run step only starts the image that already exists.
+
 #### Stopping the Test Server
 
 Press `Ctrl+C`. If the server was started in the background, run `docker compose down` when Docker Compose was used, or `docker stop <container-id>` otherwise.
+
+Neither file mounts a volume, so the plugin's data folder (the H2 database and `ip-encryption.key`) exists only inside the container. `docker compose down` removes the container and that data with it, and so does `docker compose up --build` when the rebuilt image differs from the one the container was created from, because Compose then replaces the container. Each `docker run` starts a new container with an empty data folder, so the plugin generates a new key and starts an empty database.
 
 ## Authors and Acknowledgements
 
