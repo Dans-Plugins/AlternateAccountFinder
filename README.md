@@ -83,7 +83,7 @@ Windows:
 
 A `Dockerfile` and a `compose.yml` are available to build and run a Spigot test server with the plugin installed.
 
-The server is Spigot **1.20.4** on Java 17, built with BuildTools when the image is built. That version is not one of the [supported versions](#supported-minecraft-versions), so this server does not reproduce the setup releases are tested on. Building the image also builds the plugin from the working tree with `./gradlew build`, which runs the unit tests, so a failing test stops the image build.
+The server is Spigot **1.19.4** on Java 17 (Ubuntu 24.04), built with BuildTools when the image is built. 1.19.4 is the oldest of the [supported versions](#supported-minecraft-versions) and the only one that runs on Java 17; the other supported versions are not covered by this server and need a newer Java than the Gradle wrapper can run on. Building the image also builds the plugin from the working tree with `./gradlew build`, which runs the unit tests, so a failing test stops the image build.
 
 #### Setup with Docker Compose
 
