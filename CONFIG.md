@@ -32,7 +32,7 @@ database:
 
 **Type:** string  
 **Default:** `H2`  
-**Description:** The SQL dialect that jOOQ uses when generating queries. Set to `H2` for the embedded database or `MARIADB` for MariaDB/MySQL. Case does not matter, so `h2` and `mariadb` work too. If the key is set to an empty string (`dialect: ''`), or to something that is not a dialect the plugin can use, startup stops with a message naming the key and the accepted values, and the plugin disables itself rather than running against the wrong dialect. Removing the key entirely, or leaving it with no value (`dialect:` on a line of its own), is not an error — a key absent from your file falls back to the default above.
+**Description:** The SQL dialect that jOOQ uses when generating queries. Set to `H2` for the embedded database or `MARIADB` for MariaDB/MySQL. Case does not matter, so `h2` and `mariadb` work too, and spaces around the value are ignored. If the key is set to an empty string (`dialect: ''`) or one holding only whitespace, or to a name jOOQ does not recognise as a dialect, startup stops with a message naming the key and suggesting `H2` or `MARIADB`, and the plugin disables itself. Any other dialect name jOOQ recognises, such as `MYSQL`, is accepted too. The plugin bundles drivers only for H2 and MariaDB, though, and does not check that the dialect matches the database `database.url` points at. Removing the key entirely, or leaving it with no value (`dialect:` on a line of its own), is not an error — a key absent from your file falls back to the default above.
 
 **Example:**
 

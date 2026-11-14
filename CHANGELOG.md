@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - The [Configuration Guide](CONFIG.md#usage-reportingendpoint) now says a whitespace-only `usage-reporting.endpoint` or [`usage-reporting.key`](CONFIG.md#usage-reportingkey) turns reporting off, as an empty string does. The behaviour itself is unchanged.
 - The comment on `usage-reporting.key` in the bundled `config.yml` now says the same of a whitespace-only key. No key or default changed.
 - The [User Guide](USER_GUIDE.md#being-told-about-a-suspected-alt-without-running-a-command) no longer suggests that every alt notification RPKit cannot deliver leaves a warning in the server log. One aimed at an account RPKit knows but has not linked to an RPKit profile is skipped silently. The User Guide and [Configuration Guide](CONFIG.md#notify-users) also now say that Mailboxes delivers the notification as one message from `AlternateAccountFinder`, with its title and text joined. The behaviour itself is unchanged.
+- The [Configuration Guide](CONFIG.md#databasedialect) no longer says that any `database.dialect` the plugin cannot use stops startup. Only a blank value or a name jOOQ does not recognise does. Any other dialect jOOQ knows, such as `MYSQL`, is accepted, and spaces around the value are ignored. The behaviour itself is unchanged.
 
 ## [3.6.0] – 2026-11-07
 
