@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [3.6.1] – 2026-11-16
+
 ### Fixed
 
 - The [Configuration Guide](CONFIG.md#usage-reportingendpoint) now says a whitespace-only `usage-reporting.endpoint` or [`usage-reporting.key`](CONFIG.md#usage-reportingkey) turns reporting off, as an empty string does. The behaviour itself is unchanged.
