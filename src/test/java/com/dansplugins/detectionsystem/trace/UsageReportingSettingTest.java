@@ -92,6 +92,53 @@ class UsageReportingSettingTest {
     }
 
     @Test
+    void anOptOutWrittenUnderANearMissNameIsAnOptOut() throws Exception {
+        String[] nearMisses = {
+                "usage_reporting:\n  enabled: false\n",
+                "usageReporting:\n  enabled: off\n",
+                "Usage-Reporting:\n  enabled: \"false\"\n",
+                "usage-reporting: false\n",
+                "usage_reporting: no\n",
+                "usage-reporting:\n  enable: false\n",
+                "usage-reporting:\n  Enabled: false\n",
+                "usage-reporting:\n  disabled: true\n",
+                "usage-reporting:\n  enabled: true\n  disable: yes\n",
+        };
+        for (String nearMiss : nearMisses) {
+            File file = configFile("version: 1.0.0\n" + nearMiss);
+            assertTrue(UsageReportingSetting.turnedOffOnDisk(file), nearMiss);
+            assertFalse(UsageReportingSetting.isEnabled(loadLikeBukkit(file), file), nearMiss);
+        }
+    }
+
+    @Test
+    void nearMissNamesThatSayOnAreNotAnOptOut() throws Exception {
+        String[] on = {
+                "usage-reporting:\n  enabled: true\n",
+                "usage_reporting:\n  enabled: true\n",
+                "usage-reporting: true\n",
+                "usage-reporting:\n  enabled: true\n  disabled: false\n",
+                "usage-reporting:\n  enabled: true\n  endpoint: https://example.org\n",
+        };
+        for (String config : on) {
+            File file = configFile(config);
+            assertFalse(UsageReportingSetting.turnedOffOnDisk(file), config);
+        }
+    }
+
+    @Test
+    void anUpgradeOverANearMissOptOutWritesTheRealSwitchOff() throws Exception {
+        // What an upgrade did to such a file: copyDefaults(true) adds the bundled block,
+        // enabled: true, beside the operator's usage_reporting block.
+        File file = configFile("version: 1.0.0\nusage_reporting:\n  enabled: false\n");
+
+        startupSave(file);
+
+        assertEquals(Boolean.FALSE, YamlConfiguration.loadConfiguration(file).get(UsageReportingSetting.ENABLED_KEY));
+        assertFalse(UsageReportingSetting.isEnabled(loadLikeBukkit(file), file));
+    }
+
+    @Test
     void aFileWithoutTheBlockReportsByDefault() throws IOException {
         File file = configFile("version: 1.0.0\n");
 

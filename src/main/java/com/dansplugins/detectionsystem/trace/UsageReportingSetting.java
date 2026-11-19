@@ -41,11 +41,63 @@ public final class UsageReportingSetting {
         } catch (Exception e) {
             return Boolean.FALSE;
         }
+        if (hasNearMissOptOut(onDisk)) {
+            return Boolean.FALSE;
+        }
         Object value = onDisk.get(ENABLED_KEY);
         if (value == null && hasBlankEnabledLine(configFile)) {
             return Boolean.FALSE;
         }
         return value;
+    }
+
+    /**
+     * Whether {@code root} holds an attempt to turn usage reporting off that is not written
+     * exactly as {@code usage-reporting.enabled}. The plugin would not recognise such a setting,
+     * and on the next upgrade it would add the bundled block, {@code enabled: true}, next to it.
+     * An operator who wrote any of these did not ask for reporting, so each counts as off:
+     * <ul>
+     *   <li>a top-level key that spells "usage reporting" another way ({@code usage_reporting},
+     *       {@code usageReporting}, {@code Usage-Reporting}, ...) holding a value, or an
+     *       {@code enabled}-like key, that is not clearly on;</li>
+     *   <li>{@code usage-reporting: false} -- a value instead of a block;</li>
+     *   <li>inside any such block, a key that spells "enabled" another way ({@code enable},
+     *       {@code Enabled}, ...) that is not clearly on, or one that spells "disabled" whose
+     *       value is on.</li>
+     * </ul>
+     */
+    static boolean hasNearMissOptOut(ConfigurationSection root) {
+        for (String key : root.getKeys(false)) {
+            if (!normalise(key).contains("usagereport")) {
+                continue;
+            }
+            Object value = root.get(key);
+            if (!(value instanceof ConfigurationSection)) {
+                if (!TraceClient.allowsReporting(value)) {
+                    return true;
+                }
+                continue;
+            }
+            ConfigurationSection block = (ConfigurationSection) value;
+            for (String child : block.getKeys(false)) {
+                if (key.equals("usage-reporting") && child.equals("enabled")) {
+                    continue; // the switch itself, read by the caller
+                }
+                String name = normalise(child);
+                Object childValue = block.get(child);
+                if (name.contains("disabl") && TraceClient.allowsReporting(childValue)) {
+                    return true;
+                }
+                if (name.contains("enabl") && !TraceClient.allowsReporting(childValue)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static String normalise(String key) {
+        return key.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]", "");
     }
 
     /**
