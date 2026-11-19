@@ -15,6 +15,7 @@ import com.dansplugins.detectionsystem.notifications.MessageNotificationService;
 import com.dansplugins.detectionsystem.notifications.NotificationService;
 import com.dansplugins.detectionsystem.notifications.RpkNotificationService;
 import com.dansplugins.detectionsystem.trace.TraceClient;
+import com.dansplugins.detectionsystem.trace.UsageReportingSetting;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bstats.bukkit.Metrics;
@@ -179,9 +180,29 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         new Metrics(this, pluginId);
 
         // usage reporting: one event now, one per command; see config.yml
-        trace = buildTraceClient(getConfig(), getName(), getDescription().getVersion(), getLogger(), getDataFolder().getParentFile());
+        trace = buildTraceClient(getConfig(), getConfigFile(), getName(), getDescription().getVersion(), getLogger(), getDataFolder().getParentFile());
         getLogger().info(usageReportingNotice(getName(), usageReportingEndpoint(getConfig()), trace.disabledReason()));
         trace.report("startup");
+    }
+
+    /**
+     * Every save of {@code config.yml} goes through here, so none of them can lose the operator's
+     * settings, usage-reporting opt-out included. A file that cannot be parsed -- which Bukkit
+     * loads as empty, so that {@link #copyBundledUsageReportingBlock} would otherwise write the
+     * bundled {@code enabled: true} over it -- is never overwritten, and an opt-out written to the
+     * file while the server was running is kept rather than replaced by the stale loaded copy.
+     */
+    @Override
+    public void saveConfig() {
+        if (!UsageReportingSetting.prepareSave(getConfig(), getConfigFile(), false)) {
+            getLogger().severe(UsageReportingSetting.UNPARSEABLE_MESSAGE);
+            return;
+        }
+        super.saveConfig();
+    }
+
+    private File getConfigFile() {
+        return new File(getDataFolder(), "config.yml");
     }
 
     @Override
@@ -310,6 +331,16 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
      * is missing, and honoured if an operator sets it to {@code false}. {@code null} skips it.
      */
     static TraceClient buildTraceClient(ConfigurationSection config, String application, String version, Logger logger, File pluginsDirectory) {
+        return buildTraceClient(config, null, application, version, logger, pluginsDirectory);
+    }
+
+    /**
+     * As {@link #buildTraceClient(ConfigurationSection, String, String, Logger, File)}, with the
+     * switch read through {@link UsageReportingSetting#isEnabled}: it fails closed (a quoted
+     * {@code "false"} or any value that does not clearly mean on is off), and an opt-out in
+     * {@code configFile} on disk wins over the loaded {@code config}. {@code null} skips the file.
+     */
+    static TraceClient buildTraceClient(ConfigurationSection config, File configFile, String application, String version, Logger logger, File pluginsDirectory) {
         String endpoint = usageReportingEndpoint(config);
         if (endpoint.trim().isEmpty()) {
             return TraceClient.disabled();
@@ -317,7 +348,7 @@ public final class AlternateAccountFinder extends JavaPlugin implements Listener
         String key = config.getString("usage-reporting.key");
         return TraceClient.builder(endpoint, application, version)
                 .key(key != null ? key : "")
-                .enabled(config.getBoolean("usage-reporting.enabled"))
+                .enabled(UsageReportingSetting.isEnabled(config, configFile))
                 .serverWideConfig(pluginsDirectory)
                 .logger(logger)
                 .build();
