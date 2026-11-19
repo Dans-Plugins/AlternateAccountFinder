@@ -41,7 +41,42 @@ public final class UsageReportingSetting {
         } catch (Exception e) {
             return Boolean.FALSE;
         }
-        return onDisk.get(ENABLED_KEY);
+        Object value = onDisk.get(ENABLED_KEY);
+        if (value == null && hasBlankEnabledLine(configFile)) {
+            return Boolean.FALSE;
+        }
+        return value;
+    }
+
+    /**
+     * Whether {@code configFile} has an {@code enabled:} line with no value (or only a comment)
+     * inside its top-level {@code usage-reporting:} block. Bukkit drops a key with no value when
+     * it loads the file, so the bundled {@code true} would win; but an operator who blanked the
+     * switch did not ask for reporting, so it counts as off.
+     */
+    static boolean hasBlankEnabledLine(File configFile) {
+        java.util.List<String> lines;
+        try {
+            lines = java.nio.file.Files.readAllLines(configFile.toPath(), java.nio.charset.StandardCharsets.ISO_8859_1);
+        } catch (Exception e) {
+            return false;
+        }
+        boolean inBlock = false;
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+                continue;
+            }
+            boolean topLevel = !Character.isWhitespace(line.charAt(0));
+            if (topLevel) {
+                inBlock = trimmed.matches("usage-reporting\\s*:\\s*(#.*)?");
+                continue;
+            }
+            if (inBlock && trimmed.matches("enabled\\s*:\\s*(#.*)?")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Whether {@code configFile} exists but cannot be parsed as YAML. */

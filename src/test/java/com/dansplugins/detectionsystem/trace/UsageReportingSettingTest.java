@@ -66,6 +66,22 @@ class UsageReportingSettingTest {
     }
 
     @Test
+    void aBlankEnabledValueIsAnOptOut() throws Exception {
+        File file = configFile("usage-reporting:\n  enabled:   # off for now\n  key: k\n");
+        // Bukkit drops the key, so the bundled default would win.
+        assertTrue(loadLikeBukkit(file).getBoolean(UsageReportingSetting.ENABLED_KEY));
+
+        assertTrue(UsageReportingSetting.turnedOffOnDisk(file));
+        assertFalse(UsageReportingSetting.isEnabled(loadLikeBukkit(file), file));
+    }
+
+    @Test
+    void anEnabledKeyOutsideTheBlockIsNotTheSwitch() throws Exception {
+        File file = configFile("other:\n  enabled:\nusage-reporting:\n  enabled: true\n");
+        assertFalse(UsageReportingSetting.turnedOffOnDisk(file));
+    }
+
+    @Test
     void anUpgradeKeepsReportingOff() throws IOException {
         File file = configFile("version: 1.0.0\nusage-reporting:\n  enabled: false\n");
 
