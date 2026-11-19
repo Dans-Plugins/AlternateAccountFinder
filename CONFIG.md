@@ -98,7 +98,7 @@ notify-users:
 
 **Type:** boolean  
 **Default:** `true`  
-**Description:** Whether the plugin reports usage events (see [Usage reporting](#usage-reporting) below). Set to `false` to turn it off.
+**Description:** Whether the plugin reports usage events (see [Usage reporting](#usage-reporting) below). Set to `false` to turn it off. Only `true` (or `on`, `yes`, `1`) turns it on; any other value, a quoted `"false"` included, turns it off. The plugin never turns it back on by itself: a save of `config.yml` keeps an `enabled: false` that is on disk, and a `config.yml` that cannot be parsed is never overwritten (reporting stays off until it is fixed).
 
 **Example:**
 

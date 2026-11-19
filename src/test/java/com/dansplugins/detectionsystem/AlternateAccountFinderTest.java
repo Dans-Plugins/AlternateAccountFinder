@@ -380,6 +380,49 @@ class AlternateAccountFinderTest {
     }
 
     @Test
+    void aQuotedFalseTurnsReportingOff() throws Exception {
+        // getBoolean() reads the string "false" as the bundled default, true.
+        YamlConfiguration onDisk = new YamlConfiguration();
+        onDisk.loadFromString("usage-reporting:\n  enabled: \"false\"\n");
+        onDisk.setDefaults(bundledConfig());
+        assertTrue(onDisk.getBoolean("usage-reporting.enabled"));
+
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(onDisk, "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
+
+        assertFalse(trace.isEnabled());
+    }
+
+    @Test
+    void anOptOutInTheFileOnDiskWinsOverTheLoadedConfig(@TempDir Path dataFolder) throws Exception {
+        YamlConfiguration loaded = new YamlConfiguration();
+        loaded.setDefaults(bundledConfig());
+        Path configFile = dataFolder.resolve("config.yml");
+        Files.writeString(configFile, "usage-reporting:\n  enabled: false\n");
+
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(loaded, configFile.toFile(), "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
+
+        assertFalse(trace.isEnabled());
+    }
+
+    @Test
+    void aConfigFileThatCannotBeParsedIsNotOverwrittenWithTheBundledBlock(@TempDir Path dataFolder) throws Exception {
+        // Bukkit loads a config.yml with a YAML error as empty, so the block looks missing and
+        // copyBundledUsageReportingBlock() fills in enabled: true. onEnable then saves -- through
+        // saveConfig(), which must refuse, and reporting must be off.
+        String broken = "usage-reporting:\n  enabled: false\n\tdatabase: [\n";
+        Path configFile = dataFolder.resolve("config.yml");
+        Files.writeString(configFile, broken);
+        YamlConfiguration loaded = new YamlConfiguration();
+        loaded.setDefaults(bundledConfig());
+
+        assertTrue(AlternateAccountFinder.copyBundledUsageReportingBlock(loaded));
+        assertFalse(com.dansplugins.detectionsystem.trace.UsageReportingSetting.prepareSave(loaded, configFile.toFile(), false));
+        assertEquals(broken, Files.readString(configFile));
+        TraceClient trace = AlternateAccountFinder.buildTraceClient(loaded, configFile.toFile(), "AlternateAccountFinder", "1.0.0", recordingLogger(new ArrayList<>()), null);
+        assertFalse(trace.isEnabled());
+    }
+
+    @Test
     void leavesAnOperatorsOwnUsageReportingBlockAlone() {
         YamlConfiguration onDisk = new YamlConfiguration();
         onDisk.set("usage-reporting.enabled", false);
